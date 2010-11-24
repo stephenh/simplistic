@@ -26,6 +26,6 @@ And then copy & paste code from src/examples.
 
 ### License ###
 
-simplistic is is licensed under the terms of the Apache Software License v2.0.
+Simplistic is is licensed under the terms of the Apache Software License v2.0.
 <http://www.apache.org/licenses/LICENSE-2.0.html>
 
