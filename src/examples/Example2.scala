@@ -3,21 +3,20 @@
  */
 
 import simplistic._
-import simplistic.Query._
-import simplistic.Conversions._
-
-import simplistic._
+import Query._
+import Conversions._
+import Attributes._
 
 val account = new SimpleDBAccount(System.getenv("AWS_ACCESS_KEY_ID"), System.getenv("AWS_SECRET_ACCESS_KEY"))
 
-val data = account domain "data"
+val data = account domain "testdata"
 
 // make sure the domain exists at simpleDB
 data.create()
 
 // define some attributes
 val user = attribute("user")
-val startDate = attribute("startDate", ISO8610Date)
+val startDate = attribute("startDate", ISO8601Date)
 val visits = attribute("visits", PositiveInt)
 val tags = attribute("tags")
 
