@@ -1,4 +1,4 @@
-package org.sublime
+package simplistic
 
 import Conversions._
 
@@ -26,12 +26,12 @@ object Attributes {
      * list of values retrieved from the set and converted from strings back to their
      * original type.
      */
-    def apply(result: Map[String, Set[String]]): List[T] =
+    def apply(result: scala.collection.Map[String, Set[String]]): List[T] =
       if (! result.contains(name)) List.empty
-      else (result(name) flatMap (_ match {
+      else (result(name) flatMap {
         case conversion(value) => List(value)
         case _ => List.empty
-      })).toList
+      }).toList
   }
 
   /** Create a simple attribute which performs no conversion on string values. */

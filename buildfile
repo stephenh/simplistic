@@ -16,9 +16,10 @@ SLF4J = [
 ]
 LOG4J = "log4j:log4j:jar:1.2.15"
 
-define "simpledb-scala-binding" do
+desc 'Scala binding for Amazon SimpleDB'
+define "simplistic" do
   project.version = VERSION_NUMBER
-  project.group = "org.alexboisvert"
+  project.group = "simplistic"
 
   compile.with HTTPCLIENT, CODEC, POOL
 

@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.sublime.amazon.simpleDB
+package simplistic
 
 import Request._
 import scala.xml._
 
 trait Concrete {
-  def makeSimpleDBRequest(request: SimpleDBRequest): Elem
+  def doRequest(request: SimpleDBRequest): Elem
 
   def awsAccessKeyId: String
 
@@ -35,7 +35,7 @@ trait Concrete {
       val nextToken: Option[String],
       val maxNumberOfDomains: Option[Int]
   ) extends ListDomains with Basics {
-    def response = new ListDomainsResponse(makeSimpleDBRequest(this))
+    def response = new ListDomainsResponse(doRequest(this))
   }
 
   object ListDomainsRequest {
@@ -46,16 +46,16 @@ trait Concrete {
   }
 
   class CreateDomainRequest (val domainName: String) extends CreateDomain with Basics {
-    def response = new CreateDomainResponse(makeSimpleDBRequest(this))
+    def response = new CreateDomainResponse(doRequest(this))
   }
 
   class DeleteDomainRequest (val domainName: String) extends DeleteDomain with Basics
   {
-    def response = new DeleteDomainResponse(makeSimpleDBRequest(this))
+    def response = new DeleteDomainResponse(doRequest(this))
   }
 
   class DomainMetadataRequest(val domainName: String) extends DomainMetadata with Basics {
-    def response = new DomainMetadataResponse(makeSimpleDBRequest(this))
+    def response = new DomainMetadataResponse(doRequest(this))
   }
 
   class PutAttributesRequest(
@@ -63,14 +63,14 @@ trait Concrete {
     val itemName: String,
     val attributes: Map[String, (Set[String], Boolean)]
   ) extends PutAttributes with Basics {
-    def response = new PutAttributesResponse(makeSimpleDBRequest(this))
+    def response = new PutAttributesResponse(doRequest(this))
   }
 
   class BatchPutAttributesRequest(
     val domainName: String,
     val operations: List[AttributeOperation]
   ) extends BatchPutAttributes with Basics {
-    def response = new BatchPutAttributesResponse(makeSimpleDBRequest(this))
+    def response = new BatchPutAttributesResponse(doRequest(this))
   }
 
   class DeleteAttributesRequest(
@@ -78,7 +78,7 @@ trait Concrete {
     val itemName: String,
     val attributes: Map[String, Set[String]]
   ) extends DeleteAttributes with Basics {
-    def response = new DeleteAttributesResponse(makeSimpleDBRequest(this))
+    def response = new DeleteAttributesResponse(doRequest(this))
   }
 
   class GetAttributesRequest(
@@ -86,7 +86,7 @@ trait Concrete {
     val itemName: String,
     val attributes: Set[String]
   ) extends GetAttributes with Basics {
-    def response = new GetAttributesResponse(makeSimpleDBRequest(this))
+    def response = new GetAttributesResponse(doRequest(this))
   }
 
   class QueryRequest(
@@ -95,7 +95,7 @@ trait Concrete {
     val nextToken: Option[String],
     val maxNumberOfItems: Option[Int]
   ) extends Query with Basics {
-    def response = new QueryResponse(makeSimpleDBRequest(this))
+    def response = new QueryResponse(doRequest(this))
   }
 
   object QueryRequest {
@@ -115,7 +115,7 @@ trait Concrete {
   ) extends QueryWithAttributes with Basics {
     val nextToken: Option[String] = None
     val maxNumberOfItems = None
-    def response = new QueryWithAttributesResponse(makeSimpleDBRequest(this))
+    def response = new QueryWithAttributesResponse(doRequest(this))
   }
 
   object QueryWithAttributesRequest {
@@ -135,7 +135,7 @@ trait Concrete {
     val nextToken: Option[String],
     val maxNumberOfItems: Option[Int]
   ) extends Select with Basics {
-    def response = new SelectResponse(makeSimpleDBRequest(this))
+    def response = new SelectResponse(doRequest(this))
   }
 
   object SelectRequest {

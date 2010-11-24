@@ -1,14 +1,10 @@
-package org.sublime.amazon.simpleDB
+package simplistic
 
-import org.sublime.Attributes._
-import org.sublime.Conversions._
-
-import api.{Domain, Item, ItemSnapshot, SimpleAPI}
+import Attributes._
+import Conversions._
 import Quoting._
 
 object Select {
-
-  // implicit def toSelectAttribute[T](a: Attribute[T]): SelectAttribute[T] = new SelectAttribute(a)
 
   trait FromExpression {
     def queryString: String
@@ -19,10 +15,10 @@ object Select {
   }
 
   case class LimitedExpression(e: LimitableExpression, n: Int) extends FromExpression {
-    override def queryString: String = e.queryString + " limit " + n
+    override def queryString = e.queryString + " limit " + n
   }
 
-  trait SortedExpression extends LimitableExpression
+  trait SortedExpression extends LimitableExpression {}
 
   case class DescendingOrder[T](e: Expression, a: Attribute[T]) extends SortedExpression {
     def queryString = e.queryString + " order by " + quoteName(a.name) + " desc"
@@ -65,7 +61,6 @@ object Select {
     def queryString = "not " + e.queryString
   }
 
-  /*
   def not(e: SelectExpression) = Not(e)
 
   trait Comparison extends SelectExpression
@@ -165,38 +160,38 @@ object Select {
     def itemsWhere(e: Expression): Stream[Item] = d.api.items(itemName + from(d) + whereClause(e), d)
 
     def count: Int = count(EmptyExpression)
-}
-
-class SourceSelection(attributes: AttributeSelection, d: Domain) {
-  def where(e: FromExpression): Stream[ItemSnapshot] = {
-      d.api.select(attributes.queryString + from(d) + whereClause(e), d)
   }
-}
 
-class CountSource(api: SimpleAPI, d: Domain) {
-  private val countValue = attribute("Count", PositiveInt)
-
-  val toCount = "count(*) "
-
-  private def values(whereClause: String) =
-    d.api.select(toCount + from(d) + whereClause, d) flatMap countValue
-
-  def where(e: Expression): Int = {
-    val e2 = e match {
-      case EmptyExpression => ""
-      case e: Expression => whereClause(e)
+  class SourceSelection(attributes: AttributeSelection, d: Domain) {
+    def where(e: FromExpression): Stream[ItemSnapshot] = {
+      d.api.select(attributes.queryString + from(d) + whereClause(e), d)
     }
-    values(e2).sum
+  }
+
+  class CountSource(api: SimpleAPI, d: Domain) {
+    private val countValue = attribute("Count", PositiveInt)
+
+    val toCount = "count(*) "
+
+    private def values(whereClause: String) =
+      d.api.select(toCount + from(d) + whereClause, d) flatMap { m => countValue(m) }
+
+    def where(e: Expression): Int = {
+      val e2 = e match {
+        case EmptyExpression => ""
+        case e: Expression => whereClause(e)
+      }
+      values(e2).sum
+    }
   }
 
   class AttributeSelection(val api: SimpleAPI, val queryString: String) {
     def from(d: Domain) = new SourceSelection(this, d)
-    def from(name: String) = new SourceSelection(this, api.domain(name))
+   def from(name: String) = new SourceSelection(this, api.domain(name))
   }
 
   class CountSelection(val api: SimpleAPI) {
     def from(d: Domain) = new CountSource(api, d)
     def from(name: String) = new CountSource(api, api.domain(name))
   }
-  */
 }

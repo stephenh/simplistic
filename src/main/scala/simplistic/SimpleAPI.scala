@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.sublime.amazon.simpleDB.api
+package simplistic
 
-import org.sublime.amazon.simpleDB._
 import Request.{AttributeOperation, AddValue, ReplaceValue}
 
 import scala.collection.MapProxy
@@ -25,12 +24,12 @@ import scala.collection.MapProxy
  * via the 'item' field.
  */
 class ItemSnapshot(val item: Item, val self: Map[String,Set[String]])
-extends MapProxy[String,Set[String]] with BatchOperations
+  extends MapProxy[String,Set[String]] with BatchOperations
 {
   def batch = item.batch
 
   /** Friendly toString for diagnostics  */
-  override def toString = "ItemSnapshot("+item+", "+self
+  override def toString = "ItemSnapshot(" + item + ", " + self + ")"
 }
 
 /**
@@ -43,7 +42,7 @@ extends MapProxy[String,Set[String]] with BatchOperations
   lazy val batch = new Batch(name)
 
   /*** Friendly toString for diagnostics  */
-  override def toString = "ItemSnapshot("+name+", "+self
+  override def toString = "ItemSnapshot(" + name + ", " + self + ")"
 }
 
 /**

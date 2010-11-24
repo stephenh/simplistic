@@ -1,9 +1,8 @@
-package org.sublime.amazon.simpleDB
+package simplistic
 
 
-import api.{Domain, ItemSnapshot, SimpleAPI}
-    import org.sublime.Attributes._
-    import Quoting._
+import Attributes._
+import Quoting._
 
 object Query {
 

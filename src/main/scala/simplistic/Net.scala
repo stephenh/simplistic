@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.sublime.amazon.simpleDB
+package simplistic
 
 import Request._
 import scala.xml._
@@ -20,10 +20,6 @@ import scala.xml._
 import org.apache.commons.httpclient.HttpClient
 import org.apache.commons.pool._
 import org.apache.commons.pool.impl._
-
-object Service {
-  val url = "https://sdb.amazonaws.com"
-}
 
 private class ConnectionProvider extends BasePoolableObjectFactory {
   override def makeObject () = new HttpClient()
@@ -48,16 +44,14 @@ private class ConnectionPool {
   }
 }
 
-class Connection (val awsAccessKeyId:String, awsSecretKey:String) {
-  import Service._
+class Connection(val awsAccessKeyId:String, awsSecretKey:String, val url: String) {
   import Exceptions.toException
-
   import org.apache.commons.httpclient.methods.{GetMethod, PostMethod}
 
   private val signer = new Signer(awsSecretKey)
   private val pool = new ConnectionPool()
 
-  var trace = false
+  @transient var trace = false
 
   def makeRequest (request:SimpleDBRequest) :Elem = {
     if (trace) diagnose(request.parameters)

@@ -1,4 +1,4 @@
-package org.sublime.amazon.simpleDB {
+package simplistic {
 
     object Quoting {
 

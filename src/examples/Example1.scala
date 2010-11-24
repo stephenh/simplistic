@@ -1,5 +1,5 @@
 // Cut & paste into Scala REPL
-import org.sublime.amazon.simpleDB.api._
+import simplistic._
 
 val account = new SimpleDBAccount(System.getenv("AWS_ACCESS_KEY_ID"), System.getenv("AWS_SECRET_ACCESS_KEY"))
 

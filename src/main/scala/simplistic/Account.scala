@@ -12,21 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.sublime.amazon.simpleDB.api
+package simplistic
 
-import org.sublime.amazon.simpleDB._
 import Request._
 import scala.xml._
+
+object SimpleDBAccount {
+  val defaultURL = "https://sdb.amazonaws.com"
+}
 
 /**
  * A simple concrete implementation of the simpleDB API.  Instantiate one of these with
  * your AWS credentials and then use the methods defined in the SimpleAPI trait.
  */
-class SimpleDBAccount(val awsAccessKeyId:String, awsSecretKey:String) extends SimpleAPI {
-  val connection = new Connection(awsAccessKeyId, awsSecretKey)
-  def makeSimpleDBRequest (req:SimpleDBRequest) :Elem = connection.makeRequest(req)
+class SimpleDBAccount(
+  val awsAccessKeyId: String,
+  awsSecretKey: String,
+  val url: String = SimpleDBAccount.defaultURL
+) extends SimpleAPI {
 
-  // allow connection tracing to be switched on and off
-  def trace = connection.trace
-  def trace_= (v:Boolean) { connection.trace = v }
+  val connection = new Connection(awsAccessKeyId, awsSecretKey, url)
+
+  def doRequest(req: SimpleDBRequest): Elem = connection.makeRequest(req)
 }

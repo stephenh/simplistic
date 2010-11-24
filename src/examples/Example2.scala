@@ -2,15 +2,18 @@
  * Simple test file used for experimentation at the console.
  */
 
-import org.sublime.amazon.simpleDB.api.Test._
-import org.sublime.amazon.simpleDB.Query._
-import org.sublime.amazon.simpleDB.Conversions._
+import simplistic._
+import simplistic.Query._
+import simplistic.Conversions._
 
-val account = loadAccount
+import simplistic._
+
+val account = new SimpleDBAccount(System.getenv("AWS_ACCESS_KEY_ID"), System.getenv("AWS_SECRET_ACCESS_KEY"))
+
 val data = account domain "data"
 
 // make sure the domain exists at simpleDB
-data create
+data.create()
 
 // define some attributes
 val user = attribute("user")

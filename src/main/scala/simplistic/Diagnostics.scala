@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.sublime.amazon.simpleDB
+package simplistic
 
 trait Diagnostics extends Concrete {
   // Simple test methods.
