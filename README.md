@@ -1,11 +1,11 @@
-Scala Bindings for SimpleDB (Amazon Web Services)
-=================================================
+Simplistic: Scala Bindings for SimpleDB (Amazon Web Services)
+=============================================================
 
 This is a fork of <http://github.com/rbarooah/simpledb-scala-binding> to clean up the code and port to Scala 2.8.0.
 
 ### Building ###
 
-You need Apache Buildr 1.3.x or higher.
+You need Apache Buildr 1.4.x or higher.
 
     # compile, test and package .jars
     buildr package
@@ -14,8 +14,10 @@ You need Apache Buildr 1.3.x or higher.
 
 Launch your Scala REPL and see the examples under <src/examples>.
 
-    # launch the sample stopwatch server on port 9999
-    scala -jar target/simpledb-scala-binding-1.0.0.jar
+    # launch Scala REPL
+    buildr shell
+
+Copy & paste from src/examples.
 
 ### Target platform ###
 
@@ -24,5 +26,6 @@ Launch your Scala REPL and see the examples under <src/examples>.
 
 ### License ###
 
-simpledb-scala-binding is is licensed under the terms of the Apache Software License v2.0.
+simplistic is is licensed under the terms of the Apache Software License v2.0.
 <http://www.apache.org/licenses/LICENSE-2.0.html>
+
