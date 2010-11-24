@@ -24,5 +24,7 @@ define "simpledb-scala-binding" do
 
   test.using :specs
   test.with LOG4J, SLF4J
+
+  package :jar
 end
 
