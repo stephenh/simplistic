@@ -1,7 +1,7 @@
 package org.sublime.amazon.simpleDB {
-    
+
     object Quoting {
-     
+
         /**
          * Generic quoting function
          */
@@ -12,12 +12,12 @@ package org.sublime.amazon.simpleDB {
          * Quote a value.
          */
         def quoteValue (value:String) = quote(value, '\'', valueRules)
-        
+
         /**
          * Quote an attribute name.
          */
         def quoteName (name:String) = quote(name, '`', attributeRules)
-     
+
         /**
          * Rules for quoting attribute names.
          */
@@ -25,7 +25,7 @@ package org.sublime.amazon.simpleDB {
             case '`' => "``"
             case a:Char => a
         }
-        
+
         /**
          * Rules for quoting values.
          */
@@ -35,5 +35,5 @@ package org.sublime.amazon.simpleDB {
             case '\'' => "''"
             case a:Char => a
         }
-    }    
+    }
 }
