@@ -12,12 +12,12 @@ You need Apache Buildr 1.4.x or higher.
 
 ### Examples ###
 
-Launch your Scala REPL and see the examples under <src/examples>.
+Launch your Scala REPL,
 
     # launch Scala REPL
     buildr shell
 
-Copy & paste from src/examples.
+And then copy & paste code from src/examples.
 
 ### Target platform ###
 
