@@ -16,6 +16,10 @@ SLF4J = [
 ]
 LOG4J = "log4j:log4j:jar:1.2.15"
 
+FAKESDB = artifact("fakesdb:fakesdb-standalone:jar:1.8")
+
+download(artifact(FAKESDB) => 'http://github.com/downloads/stephenh/fakesdb/fakesdb-standalone-1.8.jar')
+
 desc 'Scala binding for Amazon SimpleDB'
 define "simplistic" do
   project.version = VERSION_NUMBER
@@ -23,8 +27,8 @@ define "simplistic" do
 
   compile.with HTTPCLIENT, CODEC, POOL
 
-  test.using :specs
-  test.with LOG4J, SLF4J
+  test.using :scalatest
+  test.with FAKESDB, LOG4J, SLF4J
 
   package :jar
 end
