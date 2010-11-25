@@ -22,7 +22,7 @@ object SimpleDBAccount {
 }
 
 /**
- * A simple concrete implementation of the simpleDB API.  Instantiate one of these with
+ * A simple concrete implementation of the SimpleDB API.  Instantiate one of these with
  * your AWS credentials and then use the methods defined in the SimpleAPI trait.
  */
 class SimpleDBAccount(

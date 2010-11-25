@@ -59,7 +59,7 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
    *
    * This is the analog of the 'DomainMetadata' request.
    */
-  def metadata = (new DomainMetadataRequest(name)).response.result
+  def metadata: DomainMetadataResult = (new DomainMetadataRequest(name)).response.result
 
   /**
    * Delete this domain from the SimpleDB account.
@@ -428,9 +428,12 @@ trait SimpleAPI extends Concrete
 }
 
 object StreamMaker {
-  // given a stream of generators of generators, which generate type T, and a
-  // function to convert a generator into a stream of T, produce a single stream
-  // that yields all of the Ts from each generator.
+  
+  /**
+   * Given a stream of generators of generators, which generate type T, and a
+   * function to convert a generator into a stream of T, produce a single stream
+   * that yields all of the Ts from each generator.
+   */
   def streamOfStreams[T, G](sources: Stream[G], generate: (G => Stream[T])): Stream[T] = {
     def next(sources: Stream[G], generated: Stream[T]): Stream[T] = {
       if (generated.isEmpty) {
@@ -441,8 +444,10 @@ object StreamMaker {
     next(sources, Stream.empty)
   }
 
-  // given a list of type K, and a function to convert from K to T, produce
-  // a stream that performs the conversion as each element is accessed
+  /**
+   * Given a list of type K, and a function to convert from K to T, produce
+   * a stream that performs the conversion as each element is accessed.
+   */
   def streamOfObjects[T, K](list: List[K], convert: (K => T)): Stream[T] = {
     def makeStream(remaining: List[K]): Stream[T] = {
       remaining match {

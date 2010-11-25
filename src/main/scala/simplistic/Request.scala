@@ -29,7 +29,7 @@ package simplistic {
       		"Version" -> version
       	) ++ specificParameters
 
-      	def specificParameters:Map[String, String]
+        def specificParameters: Map[String, String]
       }
 
       trait CreateDomain extends SimpleDBRequest {
@@ -154,7 +154,7 @@ package simplistic {
       case class ReplaceValue(item:String, name:String, value:String) extends AttributeOperation
 
       trait DeleteAttributes extends SimpleDBRequest {
-          import Attributes._
+        import Attributes._
 
       	def action = "DeleteAttributes"
       	def attributes:Map[String, Set[String]]

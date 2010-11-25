@@ -24,7 +24,7 @@ trait Concrete {
 
   def now(): String = dateFormat.format(new java.util.Date)
 
-  val dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+  def dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
 
   trait Basics {
     def timeStamp = now()
