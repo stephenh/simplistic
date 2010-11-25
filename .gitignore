@@ -1,3 +1,5 @@
 .DS_Store
 target/
 *.tmproj
+.scala_dependencies
+reports/
