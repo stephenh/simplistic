@@ -201,5 +201,6 @@ object Exceptions {
       case "UnsupportedHttpVerb" => new UnsupportedHttpVerb(code, message, boxUsage)
       case "UnsupportedNextToken" => new UnsupportedNextToken(code, message, boxUsage)
       case "URITooLong" => new URITooLong(code, message, boxUsage)
+      case _ => new SimpleDBException(code, message, boxUsage)
   }
 }
