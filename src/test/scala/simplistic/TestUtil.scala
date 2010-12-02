@@ -3,6 +3,7 @@ package simplistic
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.Suite
 import fakesdb.Jetty
+import simplistic._
 
 object TestUtil {
 
