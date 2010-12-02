@@ -242,6 +242,12 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
     this,
     (new GetAttributesRequest(domain.name, name, Set())).response.result.attributes
   )
+  
+  def attributesOption = { 
+    val attrs = attributes
+    
+    if (attrs.isEmpty) None else Some(attrs) 
+  }
 
   /** Read a selection of attributes from this item */
   def attributes(attributes: Set[String]) = new ItemSnapshot(
