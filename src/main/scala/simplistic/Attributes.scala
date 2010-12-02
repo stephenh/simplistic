@@ -33,10 +33,46 @@ object Attributes {
         case _ => List.empty
       }).toList
   }
+  
+  case class RequiredSingleValuedAttribute[T](
+      override val name: String, 
+      conversion: Conversion[T]
+  ) extends NamedAttribute {
+    def apply(value: T) = (name -> conversion(value))
+    
+    def apply(result: scala.collection.Map[String, Set[String]]): T = {
+      result(name) head match {
+        case conversion(value) => value
+      }
+    }
+  }
+  
+  case class OptionalSingleValuedAttribute[T](
+      override val name: String,
+      conversion: Conversion[T]
+  ) extends NamedAttribute {
+    def apply(value: T) = (name -> conversion(value))
+    
+    def apply(result: scala.collection.Map[String, Set[String]]): Option[T] = {
+      if (! result.contains(name)) None
+      else result(name) head match {
+        case conversion(value) => Some(value)
+      }
+    }
+  }
 
   /** Create a simple attribute which performs no conversion on string values. */
   def attribute(name: String) = Attribute(name, Conversions.PassThrough)
 
   /** Create a typed attribute with an associated conversion to and from that type. */
   def attribute[T](name: String, conversion: Conversion[T]) = Attribute[T](name, conversion)
+  
+
+  /** Create an optional attribute that's not multi-valued */
+  def singleAttribute[T](name: String) = OptionalSingleValuedAttribute(name, Conversions.PassThrough)
+  def singleAttribute[T](name: String, conversion: Conversion[T]) = OptionalSingleValuedAttribute[T](name, conversion)
+  
+  /** Create a non-multi-valued attribute that's required */
+  def singleRequiredAttribute[T](name: String) = RequiredSingleValuedAttribute(name, Conversions.PassThrough)  
+  def singleRequiredAttribute[T](name: String, conversion: Conversion[T]) = RequiredSingleValuedAttribute[T](name, conversion)
 }
