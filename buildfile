@@ -25,7 +25,7 @@ define "simplistic" do
   project.version = VERSION_NUMBER
   project.group = "simplistic"
 
-  compile.with HTTPCLIENT, CODEC, POOL
+  compile.with(HTTPCLIENT, CODEC, POOL).using(:deprecation => true)
 
   test.using :scalatest
   test.with FAKESDB, LOG4J, SLF4J

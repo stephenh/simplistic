@@ -169,7 +169,7 @@ object Select {
   }
 
   class CountSource(api: SimpleAPI, d: Domain) {
-    private val countValue = attribute("Count", PositiveInt)
+    private val countValue = multiValued("Count", PositiveInt)
 
     val toCount = "count(*) "
 
