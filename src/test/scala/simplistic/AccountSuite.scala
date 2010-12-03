@@ -4,7 +4,7 @@ import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class AccountSuite extends WordSpec with ShouldMatchers with TestUtil.CleanBefore {
+class AccountSuite extends WordSpec with ShouldMatchers with TestUtil.CleanBefore with TestUtil.StopAndStartServer {
   import TestUtil._
 
   "Account.domains" should {
@@ -23,7 +23,8 @@ class AccountSuite extends WordSpec with ShouldMatchers with TestUtil.CleanBefor
       for (d <- domains) {
         account.domain(d).create()
       }
-      account.domains.map(_.name).toSet should be === Set(domains)
+      
+      account.domains.map(_.name).toSet should be === domains.toSet
     }
   }
 }
