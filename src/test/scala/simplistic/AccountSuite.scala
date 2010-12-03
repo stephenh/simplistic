@@ -8,7 +8,7 @@ class AccountSuite extends WordSpec with ShouldMatchers with TestUtil.CleanBefor
   import TestUtil._
 
   "Account.domains" should {
-    
+
     "return zero when SimpleDB is empty" in {
       account.domains should have size (0)
     }
@@ -23,7 +23,7 @@ class AccountSuite extends WordSpec with ShouldMatchers with TestUtil.CleanBefor
       for (d <- domains) {
         account.domain(d).create()
       }
-      
+
       account.domains.map(_.name).toSet should be === domains.toSet
     }
   }

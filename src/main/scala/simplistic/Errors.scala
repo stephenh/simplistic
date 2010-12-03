@@ -40,6 +40,9 @@ object Exceptions {
   class AuthMissingFailure(code: String, message: String, boxUsage: Double)
     extends ClientException(code, message, boxUsage)
 
+  class ConditionalCheckFailed(code: String, message: String, boxUsage: Double)
+    extends ClientException(code, message, boxUsage)
+
   class DuplicateItemName(code: String, message: String, boxUsage: Double)
     extends ClientException(code, message, boxUsage)
 
@@ -161,6 +164,7 @@ object Exceptions {
       case "AccessFailure" => new AccessFailure(code, message, boxUsage)
       case "AuthFailure" => new AuthFailure(code, message, boxUsage)
       case "AuthMissingFailure" => new AuthMissingFailure(code, message, boxUsage)
+      case "ConditionalCheckFailed" => new ConditionalCheckFailed(code, message, boxUsage)
       case "DuplicateItemName" => new DuplicateItemName(code, message, boxUsage)
       case "FeatureDeprecated" => new FeatureDeprecated(code, message, boxUsage)
       case "InternalError" => new InternalError(code, message, boxUsage)

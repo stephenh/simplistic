@@ -61,7 +61,8 @@ trait Concrete {
   class PutAttributesRequest(
     val domainName: String,
     val itemName: String,
-    val attributes: Map[String, (Set[String], Boolean)]
+    val attributes: Map[String, (Set[String], Boolean)],
+    val condition: PutConditions.PutCondition = PutConditions.NoCondition
   ) extends PutAttributes with Basics {
     def response = new PutAttributesResponse(doRequest(this))
   }

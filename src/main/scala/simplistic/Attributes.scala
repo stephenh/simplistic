@@ -7,13 +7,13 @@ object Attributes {
   trait NamedAttribute {
     val name: String
   }
-  
+
   trait Attribute[T] {
     val name: String
     val conversion: Conversion[T]
-    
+
     /** When applied to a value, the conversion returns a name value pair of strings */
-    def apply(value: T) = (name -> conversion(value))    
+    def apply(value: T) = (name -> conversion(value))
   }
 
   /**
@@ -37,26 +37,33 @@ object Attributes {
         case _ => List.empty
       }).toList
   }
-  
+
+  trait SingleValuedAttribute[T] extends Attribute[T] {
+    def apply(expected: Option[T]): Tuple2[String, Option[String]] = {
+      (name -> (expected map conversion.apply))
+    }
+  }
+
+
   case class RequiredSingleValuedAttribute[T](
-      override val name: String, 
+      override val name: String,
       override val conversion: Conversion[T]
-  ) extends Attribute[T] {
+  ) extends SingleValuedAttribute[T] {
     def apply(result: scala.collection.Map[String, Set[String]]): T = {
       if (! result.contains(name)) throw new MissingRequiredAttribute(name)
-      
+
       result(name) head match {
         case conversion(value) => value
       }
     }
   }
-  
+
   class MissingRequiredAttribute(val name: String) extends RuntimeException("Missing required attribute: " + name)
-  
+
   case class OptionalSingleValuedAttribute[T](
       override val name: String,
       override val conversion: Conversion[T]
-  ) extends Attribute[T] {
+  ) extends SingleValuedAttribute[T] {
     def apply(result: scala.collection.Map[String, Set[String]]): Option[T] = {
       if (! result.contains(name)) None
       else result(name) head match {
@@ -70,13 +77,24 @@ object Attributes {
 
   /** Create a typed attribute with an associated conversion to and from that type. */
   def multiValued[T](name: String, conversion: Conversion[T]) = MultiValuedAttribute[T](name, conversion)
-  
+
 
   /** Create an optional attribute that's not multi-valued */
   def optionalAttribute[T](name: String) = OptionalSingleValuedAttribute(name, Conversions.PassThrough)
   def optionalAttribute[T](name: String, conversion: Conversion[T]) = OptionalSingleValuedAttribute[T](name, conversion)
-  
+
   /** Create a non-multi-valued attribute that's required */
-  def attribute[T](name: String) = RequiredSingleValuedAttribute(name, Conversions.PassThrough)  
+  def attribute[T](name: String) = RequiredSingleValuedAttribute(name, Conversions.PassThrough)
   def attribute[T](name: String, conversion: Conversion[T]) = RequiredSingleValuedAttribute[T](name, conversion)
+
+
+  trait AttributeToPutConditionBuilder[T] {
+    def doesNotExist: PutConditions.DoesNotExist
+    def ===(value: T): PutConditions.Equals
+  }
+
+  implicit def attributeToPutCondition[T](attr: Attribute[T]) = new AttributeToPutConditionBuilder[T] {
+    override def doesNotExist = PutConditions.DoesNotExist(attr.name)
+    override def ===(value: T) = PutConditions.Equals(attr.name, attr.conversion(value))
+  }
 }
