@@ -279,8 +279,8 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
    *
    * This is the analog of the 'PutAttributes' request.
    */
-  def update(values: Map[String, (Set[String], Boolean)], conditionals:Map[String, Option[String]] = Map()) = {
-    (new PutAttributesRequest(domain.name, name, values, conditionals)).response.metadata
+  def update(values: Map[String, (Set[String], Boolean)], conditional:Option[Tuple2[String, Option[String]]] = None) = {
+    (new PutAttributesRequest(domain.name, name, values, conditional)).response.metadata
   }
 
   /** Add a single value to an attribute of this item. */
@@ -289,7 +289,7 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
   /** Add multiple values to this attribute by specifying a series of mappings. */
   def +=(pairs: (String, String)*) = update(combinePairs(false, pairs))
   
-  def +=(conditionals: Map[String, Option[String]], pairs: (String, String)*) = update(combinePairs(false, pairs), conditionals)
+  def +=(conditional: Tuple2[String, Option[String]], pairs: (String, String)*) = update(combinePairs(false, pairs), Some(conditional))
 
   /** Add multiple values to this attribute by specifying a sequence of mappings. */
   def addSeq(pairs: Seq[(String, String)]) = update(combinePairs(false, pairs))
