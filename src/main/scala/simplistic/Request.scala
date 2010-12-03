@@ -20,7 +20,7 @@ package simplistic {
       	def action:String
       	def awsAccessKeyId:String
       	def timeStamp:String
-      	def version:String = "2007-11-07"
+      	def version:String = "2009-04-15"
 
       	def parameters = Map(
       		"Action" -> action,
@@ -70,6 +70,7 @@ package simplistic {
       	def action = "PutAttributes"
       	def itemName:String
       	def attributes:Map[String, (Set[String] , Boolean)]
+        def conditionals:Map[String, Option[String]]
       	def domainName:String
       	def specificParameters = replacableAttributes ++
       		Map("DomainName" -> domainName, "ItemName"->itemName)
@@ -78,6 +79,13 @@ package simplistic {
                 def flattened = attributes flatMap (e => e match {
                   case (name, (value, replace)) => for (each <- value) yield (name, each, replace)
                 })
+                
+                def conds = (conditionals zipWithIndex) map { case ((k, v), pos) => {
+                  Map("Expected." + pos + ".Name" -> k) ++ (v match {
+                    case Some(vv) => Map("Expected." + pos + ".Value" -> vv)
+                    case _ => Map("Expected." + pos + ".Exists" -> "false")
+                  })
+                }}
 
                 def params :List[Map[String, String]] =
                     (flattened.toList zipWithIndex) map (z => z match {
@@ -86,8 +94,8 @@ package simplistic {
                                 (if (replace) param("Replace", pos, "True")
                                 else Map.empty)
                     })
-
-                (Map[String, String]() /: params) (_ ++ _)
+                
+                (Map[String, String]() /: (params ++ conds)) (_ ++ _)
       	}
       }
 
