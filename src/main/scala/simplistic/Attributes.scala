@@ -38,10 +38,17 @@ object Attributes {
       }).toList
   }
   
+  trait SingleValuedAttribute[T] extends Attribute[T] {
+    def apply(expected: Option[T]): Tuple2[String, Option[String]] = {
+      (name -> (expected map conversion.apply))
+    }    
+  }
+      
+  
   case class RequiredSingleValuedAttribute[T](
       override val name: String, 
       override val conversion: Conversion[T]
-  ) extends Attribute[T] {
+  ) extends SingleValuedAttribute[T] {
     def apply(result: scala.collection.Map[String, Set[String]]): T = {
       if (! result.contains(name)) throw new MissingRequiredAttribute(name)
       
@@ -56,7 +63,7 @@ object Attributes {
   case class OptionalSingleValuedAttribute[T](
       override val name: String,
       override val conversion: Conversion[T]
-  ) extends Attribute[T] {
+  ) extends SingleValuedAttribute[T] {
     def apply(result: scala.collection.Map[String, Set[String]]): Option[T] = {
       if (! result.contains(name)) None
       else result(name) head match {
