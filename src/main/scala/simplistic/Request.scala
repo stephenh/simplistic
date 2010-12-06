@@ -94,7 +94,7 @@ object Request {
         (flattened.toList zipWithIndex) map { case ((name, value, replace), pos) =>
           param("Name", pos, name) ++ param("Value", pos, value) ++
             (if (replace) param("Replace", pos, "True") else Map.empty)
-        })
+        }
       }
 
       (Map[String, String]() /: (params ++ conds)) (_ ++ _)
@@ -177,7 +177,7 @@ object Request {
           case None => param("Name", pos, name)
           case Some(value) => param("Value", pos, value)
         })
-      }}
+      }
 
       (Map[String,String]() /: params) (_ ++ _)
     }
