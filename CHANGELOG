@@ -1,0 +1,8 @@
+1.1 (Pending)
+ * Added: conditional put support.
+ * Added: QueryableDomain.findFirst(Expression)
+
+1.0.0 (2010-11-24)
+ * Forked, cleaned up and ported to Scala 2.8.0.
+
+
