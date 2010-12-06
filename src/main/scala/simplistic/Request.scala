@@ -70,7 +70,7 @@ package simplistic {
       	def action = "PutAttributes"
       	def itemName:String
       	def attributes:Map[String, (Set[String] , Boolean)]
-        def conditional:Option[Tuple2[String, Option[String]]]
+        def condition:PutConditions.PutCondition
       	def domainName:String
       	def specificParameters = replacableAttributes ++
       		Map("DomainName" -> domainName, "ItemName"->itemName)
@@ -80,10 +80,14 @@ package simplistic {
                   case (name, (value, replace)) => for (each <- value) yield (name, each, replace)
                 })
                 
-                def conds = (conditional map { z => (z match {
-                    case (_, None) => Map("Expected.1.Exists" -> "false")
-                    case (_, Some(v)) => Map("Expected.1.Value" -> v)
-                  }) ++ Map("Expected.1.Name" -> z._1)
+                def conds = (condition match {
+                  case PutConditions.NoCondition => None
+                  case PutConditions.DoesNotExist(name) => {
+                    Some(Map("Expected.1.Name" -> name,  "Expected.1.Exists" -> "false"))
+                  }
+                  case PutConditions.Equals(name, value) => {
+                    Some(Map("Expected.1.Name" -> name,  "Expected.1.Value" -> value))
+                  }
                 }).toList
                 
                 def params :List[Map[String, String]] =

@@ -231,7 +231,8 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
   extends BatchOperations
 {
   import api._
-
+  import PutConditions._
+  
   /** Return a string assocating this item with it's domain in the form "domain.item" */
   def path = domain + "." + name
 
@@ -279,7 +280,7 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
    *
    * This is the analog of the 'PutAttributes' request.
    */
-  def update(values: Map[String, (Set[String], Boolean)], conditional:Option[Tuple2[String, Option[String]]] = None) = {
+  def update(values: Map[String, (Set[String], Boolean)], conditional:PutCondition = NoCondition) = {
     (new PutAttributesRequest(domain.name, name, values, conditional)).response.metadata
   }
 
@@ -289,7 +290,7 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
   /** Add multiple values to this attribute by specifying a series of mappings. */
   def +=(pairs: (String, String)*) = update(combinePairs(false, pairs))
   
-  def +=(conditional: Tuple2[String, Option[String]], pairs: (String, String)*) = update(combinePairs(false, pairs), Some(conditional))
+  def +=?(condition: PutCondition)(pairs: (String, String)*) = update(combinePairs(false, pairs), condition)
 
   /** Add multiple values to this attribute by specifying a sequence of mappings. */
   def addSeq(pairs: Seq[(String, String)]) = update(combinePairs(false, pairs))
@@ -346,6 +347,13 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
 
   /** Supply an object that can be used to create batch operations. */
   lazy val batch = new Batch(name)
+}
+
+object PutConditions {
+  sealed trait PutCondition
+  case object NoCondition extends PutCondition /* default */
+  case class DoesNotExist(name: String) extends PutCondition
+  case class Equals(name: String, value: String) extends PutCondition
 }
 
 /**

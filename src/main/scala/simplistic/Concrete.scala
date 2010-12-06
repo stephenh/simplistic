@@ -62,7 +62,7 @@ trait Concrete {
     val domainName: String,
     val itemName: String,
     val attributes: Map[String, (Set[String], Boolean)],
-    val conditional: Option[Tuple2[String, Option[String]]] = None
+    val condition: PutConditions.PutCondition = PutConditions.NoCondition
   ) extends PutAttributes with Basics {
     def response = new PutAttributesResponse(doRequest(this))
   }
