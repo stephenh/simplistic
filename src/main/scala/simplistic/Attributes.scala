@@ -88,10 +88,13 @@ object Attributes {
   def attribute[T](name: String, conversion: Conversion[T]) = RequiredSingleValuedAttribute[T](name, conversion)
   
   
-  class AttributeToPutConditionWrapper[T](attr: Attribute[T]) {
-    def doesNotExist = PutConditions.DoesNotExist(attr.name)
-    def ===(value: T) = PutConditions.Equals(attr.name, attr.conversion(value))
+  trait AttributeToPutConditionBuilder[T] {
+    def doesNotExist: PutConditions.DoesNotExist
+    def ===(value: T): PutConditions.Equals
   }
   
-  implicit def attributeToPutCondition[T](attr: Attribute[T]) = new AttributeToPutConditionWrapper(attr)
+  implicit def attributeToPutCondition[T](attr: Attribute[T]) = new AttributeToPutConditionBuilder[T] {
+    override def doesNotExist = PutConditions.DoesNotExist(attr.name)
+    override def ===(value: T) = PutConditions.Equals(attr.name, attr.conversion(value))
+  }
 }
