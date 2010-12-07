@@ -95,6 +95,6 @@ object Query {
     def apply(expr: Expression) = d.withAttributes(expr.toString)
     def apply(attrs: NamedAttribute*)(expr: Expression) =
       d.withAttributes(expr.toString, attributeSet(attrs: _*))
-    def findFirst(expression: Expression): Option[ItemSnapshot] = apply(expression).firstOption
+    def findFirst(expression: Expression): Option[ItemSnapshot] = apply(expression).headOption
   }
 }
