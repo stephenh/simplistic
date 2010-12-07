@@ -1,5 +1,5 @@
 1.1 (Pending)
- * Added: conditional put support.
+ * Added: conditional put support (Larry Ogrodnek)
  * Added: QueryableDomain.findFirst(Expression)
 
 1.0.0 (2010-11-24)
