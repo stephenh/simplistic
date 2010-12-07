@@ -292,8 +292,6 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
   
   def +=?(condition: PutCondition)(pairs: (String, String)*) = update(combinePairs(false, pairs), condition)
 
-  def +=?(condition: PutCondition)(pairs: (String, String)*) = update(combinePairs(false, pairs), condition)
-
   /** Add multiple values to this attribute by specifying a sequence of mappings. */
   def addSeq(pairs: Seq[(String, String)]) = update(combinePairs(false, pairs))
 
