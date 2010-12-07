@@ -6,9 +6,7 @@ import Quoting._
 
 object Query {
 
-  abstract class Expression {
-    //def query : String
-  }
+  trait Expression
 
   trait Combinable extends Expression {
     def intersection(other: Combinable) = Combination("intersection", this, other)
@@ -26,7 +24,7 @@ object Query {
   }
 
   case class DescendingSortedCombination(target: Combination, name: String) extends Expression {
-      override def toString = target + " sort "+quoteValue(name) + " desc"
+    override def toString = target + " sort "+quoteValue(name) + " desc"
   }
 
   trait Negatable extends Expression
@@ -88,13 +86,10 @@ object Query {
   implicit def toQueryableDomain(d: Domain) : QueryableDomain = new QueryableDomain(d)
 
   class QueryableDomain(d: Domain) {
-    /*** EXPERIMENTAL METHODS ASSOCIATED WITH THE QUERY DSL ***/
-    private def attributeSet(attrs: NamedAttribute*) : Set[String] =
-      (Set[String]() /: (for (a <- attrs) yield (Set[String](a.name)))) (_ ++ _)
+    private implicit def attributeSet(attrs: Seq[NamedAttribute]): Set[String] = attrs map (_.name) toSet
 
     def apply(expr: Expression) = d.withAttributes(expr.toString)
-    def apply(attrs: NamedAttribute*)(expr: Expression) =
-      d.withAttributes(expr.toString, attributeSet(attrs: _*))
+    def apply(attrs: NamedAttribute*)(expr: Expression) = d.withAttributes(expr.toString, attrs)
     def findFirst(expression: Expression): Option[ItemSnapshot] = apply(expression).headOption
   }
 }
