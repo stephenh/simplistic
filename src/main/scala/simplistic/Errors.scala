@@ -43,6 +43,9 @@ object Exceptions {
   class ConditionalCheckFailed(code: String, message: String, boxUsage: Double)
     extends ClientException(code, message, boxUsage)
 
+  class ConditionalCheckFailed(code: String, message: String, boxUsage: Double)
+    extends ClientException(code, message, boxUsage)
+
   class DuplicateItemName(code: String, message: String, boxUsage: Double)
     extends ClientException(code, message, boxUsage)
 

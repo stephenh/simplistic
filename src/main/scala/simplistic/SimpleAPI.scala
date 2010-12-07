@@ -96,7 +96,7 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
 
   /**
    * Return a stream containing all of the items within the domain.  One simpleDB request
-   * will be perfomed initially, and subsequent queries will be performed as the stream
+   * will be performed initially, and subsequent queries will be performed as the stream
    * is read if they are needed.  This query does not obtain any of the attributes but
    * returns Item objects that you can use to retrieve the attributes you desire.
    *
@@ -191,7 +191,7 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
    * one operation.
    */
   def apply(batch: List[AttributeOperation]*) = {
-    // combine the atributes into a single operation.
+    // combine the attributes into a single operation.
     val operations = (List[AttributeOperation]() /: batch) (_ ++ _)
     new BatchPutAttributesRequest(name, operations).response.metadata
   }
@@ -232,7 +232,7 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
 {
   import api._
   import PutConditions._
-  
+
   /** Return a string assocating this item with it's domain in the form "domain.item" */
   def path = domain + "." + name
 
@@ -243,11 +243,11 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
     this,
     (new GetAttributesRequest(domain.name, name, Set())).response.result.attributes
   )
-  
-  def attributesOption = { 
+
+  def attributesOption = {
     val attrs = attributes
-    
-    if (attrs.isEmpty) None else Some(attrs) 
+
+    if (attrs.isEmpty) None else Some(attrs)
   }
 
   /** Read a selection of attributes from this item */
@@ -290,6 +290,8 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
   /** Add multiple values to this attribute by specifying a series of mappings. */
   def +=(pairs: (String, String)*) = update(combinePairs(false, pairs))
   
+  def +=?(condition: PutCondition)(pairs: (String, String)*) = update(combinePairs(false, pairs), condition)
+
   def +=?(condition: PutCondition)(pairs: (String, String)*) = update(combinePairs(false, pairs), condition)
 
   /** Add multiple values to this attribute by specifying a sequence of mappings. */
@@ -444,7 +446,7 @@ trait SimpleAPI extends Concrete
 }
 
 object StreamMaker {
-  
+
   /**
    * Given a stream of generators of generators, which generate type T, and a
    * function to convert a generator into a stream of T, produce a single stream
