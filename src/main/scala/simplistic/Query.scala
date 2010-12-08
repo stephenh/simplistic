@@ -36,12 +36,14 @@ object Query {
   }
 
   case class DescendingSort(target: Sortable, name: String) extends Expression with Negatable {
-    override def toString = "[" + target.component + "] sort " + quoteValue(name) + " desc"
+    //TODO: name quoting    
+    override def toString = target.component + " order by " + name + " desc"
   }
 
   case class AscendingSort(target: Sortable, name: String) extends Expression with Negatable {
     def desc = DescendingSort(target, name)
-    override def toString = "[" + target.component + "] sort " + quoteValue(name) + " asc"
+    //TODO: name quoting
+    override def toString = target.component + " order by " + name + " asc"
   }
 
   trait Sortable extends Predicate {
@@ -56,7 +58,7 @@ object Query {
     def unary_! = Negation(this)
 
     def component : String
-    override def toString = "[" + component + "]"
+    override def toString = component
   }
 
   case class Conjunction(operator: String, lhs: Predicate, rhs: Predicate) extends Predicate with Sortable {
@@ -66,7 +68,8 @@ object Query {
   case class Comparison [T](operator: String, attribute: Attribute[T], value: T) extends Predicate with Sortable {
     def component = {
       val (name, converted) = attribute(value)
-      quoteValue(name) + " " + operator + " " + quoteValue(converted)
+      // TODO: name should really be quoteName() but fakeSDB doesn't support this...
+      name + " " + operator + " " + quoteValue(converted)
     }
   }
 

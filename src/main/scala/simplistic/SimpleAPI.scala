@@ -106,18 +106,8 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
   def items: Stream[Item] = query(None)
 
   private def query(expression: Option[String]): Stream[Item] = {
-    def generate(res: QueryResponse): Stream[Item] =
-      streamOfObjects[Item, String](res.result.itemNames.toList, item)
 
-    def responses(req: QueryRequest, res: QueryResponse): Stream[QueryResponse] = {
-      Stream.cons(res, QueryRequest.next(req, res) match {
-        case None => Stream.empty
-        case Some(request) => responses(request, request.response)
-      })
-    }
-
-    val start = QueryRequest.start(name, expression)
-    streamOfStreams(responses(start, start.response), generate)
+    api.items(expression.get, this)
   }
 
   /**
@@ -171,19 +161,10 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
   * This is the analog of using the 'QueryWithAttributes' request.
   */
  def withAttributes(expression: Option[String], attributes: Set[String]): Stream[ItemSnapshot] = {
-   def convert(i: QueryWithAttributesResult#Item) = new ItemSnapshot(item(i.name), i.attributes)
-
-   def generate(res: QueryWithAttributesResponse): Stream[ItemSnapshot] =
-     streamOfObjects(res.result.items.toList, convert)
-
-   def responses(req: QueryWithAttributesRequest, res: QueryWithAttributesResponse): Stream[QueryWithAttributesResponse] =
-    Stream.cons(res, QueryWithAttributesRequest.next(req, res) match {
-      case None => Stream.empty
-      case Some(request) => responses(request, request.response)
-    })
-
-    val start = QueryWithAttributesRequest.start(name, expression, attributes)
-    streamOfStreams(responses(start, start.response), generate)
+    expression match {
+      case None => select("* from `%s`".format(name), this)
+      case Some(where) => select("* from `%s` where %s".format(name, where), this) 
+    }
   }
 
   /**
