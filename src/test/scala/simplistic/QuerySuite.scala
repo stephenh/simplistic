@@ -41,35 +41,54 @@ class QuerySuite extends WordSpec with ShouldMatchers with TestUtil.CleanBefore 
   
   
   "Domain.query" should {
-    import Attributes._
-    import Conversions._
     import Query._
-    
-    val user = attribute("user")
-    val startDate = attribute("startDate", ISO8601Date)
-    val visits = attribute("visits", PositiveInt)
-    val tags = attribute("tags")
-    
-    def setupData() = {
-      testDomain.unique += (user("robin"), startDate(new java.util.Date()), visits(3))
-      testDomain.unique += (user("jon"), startDate(new java.util.Date()), visits(20))
-      testDomain.unique += (user("alice"), startDate(new java.util.Date()), visits(15))
-      testDomain.unique += (user("jack"), startDate(new java.util.Date()), visits(100))
-    }
+    import TestDomainData._
 
     "simple query expression" in {
-      setupData()
+      setupData(testDomain)
       (testDomain (visits > 16) map (user(_))).toSet should be === Set("jon", "jack")
     }
     
     "range query expression" in {
-      setupData()
+      setupData(testDomain)
       (testDomain (visits > 16 and visits < 50) map (user(_))).head should be === "jon"
     }
     
     "range query with sorting" in {
-      setupData()
+      setupData(testDomain)
       (testDomain (visits > 1 and visits < 50 sort visits desc) map (user(_))).toList should be === List("jon", "alice", "robin")
     }
+  }
+  
+  "Domain.items" should {
+    import Attributes._
+    
+    val attr = attribute("test")
+    def addItem(s: String) { testDomain.unique += attr(s) }
+    
+    "return all items" in {
+      addItem("a")
+      addItem("b")
+      addItem("c")
+      
+      (testDomain.items map {(item) => attr(item.attributes)}).toSet should be === Set("a", "b", "c")
+    }
+  }
+}
+
+object TestDomainData {
+  import Attributes._
+  import Conversions._
+  
+  val user = attribute("user")
+  val startDate = attribute("startDate", ISO8601Date)
+  val visits = attribute("visits", PositiveInt)
+  val tags = attribute("tags")
+    
+  def setupData(d: Domain) = {
+    d.unique += (user("robin"), startDate(new java.util.Date()), visits(3))
+    d.unique += (user("jon"), startDate(new java.util.Date()), visits(20))
+    d.unique += (user("alice"), startDate(new java.util.Date()), visits(15))
+    d.unique += (user("jack"), startDate(new java.util.Date()), visits(100))
   }
 }

@@ -86,15 +86,6 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
   def item(snapshot: ItemNameSnapshot) = new Item(this, snapshot.name)
 
   /**
-   * Perform a request and return a stream of the results.  One simpleDB request will be
-   * performed initially, and subsequent queries will be performed as the stream is read
-   * if they are needed.
-   *
-   * This is the analog of the 'Query' request.
-   */
-  def query(expression: String): Stream[Item] = query(Some(expression))
-
-  /**
    * Return a stream containing all of the items within the domain.  One simpleDB request
    * will be performed initially, and subsequent queries will be performed as the stream
    * is read if they are needed.  This query does not obtain any of the attributes but
@@ -103,12 +94,7 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
    * This the exact analog of using the 'Query' request without specifying a query
    * expression.
    */
-  def items: Stream[Item] = query(None)
-
-  private def query(expression: Option[String]): Stream[Item] = {
-
-    api.items(expression.get, this)
-  }
+  def items: Stream[Item] = api.items("itemName() from `%s`".format(name), this)
 
   /**
    * Return a stream containing all of the items within the domain with all of their
