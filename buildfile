@@ -16,7 +16,7 @@ SLF4J = [
 ]
 LOG4J = "log4j:log4j:jar:1.2.15"
 
-FAKESDB = artifact("fakesdb:fakesdb-standalone:jar:1.9")
+FAKESDB = artifact("fakesdb:fakesdb-standalone:jar:1.11")
 
 download(artifact(FAKESDB) => 'https://github.com/downloads/stephenh/fakesdb/fakesdb-standalone-1.11.jar')
 
