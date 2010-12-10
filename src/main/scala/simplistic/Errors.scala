@@ -39,7 +39,7 @@ object Exceptions {
 
   class AuthMissingFailure(code: String, message: String, boxUsage: Double)
     extends ClientException(code, message, boxUsage)
-
+  
   class ConditionalCheckFailed(code: String, message: String, boxUsage: Double)
     extends ClientException(code, message, boxUsage)
 

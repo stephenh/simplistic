@@ -90,47 +90,6 @@ trait Concrete {
     def response = new GetAttributesResponse(doRequest(this))
   }
 
-  class QueryRequest(
-    val domainName: String,
-    val queryExpression: Option[String],
-    val nextToken: Option[String],
-    val maxNumberOfItems: Option[Int]
-  ) extends Query with Basics {
-    def response = new QueryResponse(doRequest(this))
-  }
-
-  object QueryRequest {
-    def start(domainName: String, queryExpression: Option[String]) =
-      new QueryRequest(domainName, queryExpression, None, None)
-
-    def next(req: QueryRequest, res: QueryResponse): Option[QueryRequest] =
-      res.result.nextToken map { token =>
-        new QueryRequest(req.domainName, req.queryExpression, Some(token), None)
-      }
-  }
-
-  class QueryWithAttributesRequest(
-    val domainName: String,
-    val queryExpression: Option[String],
-    val attributes: Set[String]
-  ) extends QueryWithAttributes with Basics {
-    val nextToken: Option[String] = None
-    val maxNumberOfItems = None
-    def response = new QueryWithAttributesResponse(doRequest(this))
-  }
-
-  object QueryWithAttributesRequest {
-    def start(domainName: String, queryExpression: Option[String], attributes: Set[String]) =
-      new QueryWithAttributesRequest(domainName, queryExpression, attributes)
-
-    def next(req: QueryWithAttributesRequest, res: QueryWithAttributesResponse):  Option[QueryWithAttributesRequest] =
-      res.result.nextToken map { token =>
-        new QueryWithAttributesRequest(req.domainName, req.queryExpression, req.attributes) {
-          override val nextToken: Option[String] = Some(token)
-        }
-      }
-  }
-
   class SelectRequest(
     val selectExpression: String,
     val nextToken: Option[String],

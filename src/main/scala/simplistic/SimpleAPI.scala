@@ -86,15 +86,6 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
   def item(snapshot: ItemNameSnapshot) = new Item(this, snapshot.name)
 
   /**
-   * Perform a request and return a stream of the results.  One simpleDB request will be
-   * performed initially, and subsequent queries will be performed as the stream is read
-   * if they are needed.
-   *
-   * This is the analog of the 'Query' request.
-   */
-  def query(expression: String): Stream[Item] = query(Some(expression))
-
-  /**
    * Return a stream containing all of the items within the domain.  One simpleDB request
    * will be performed initially, and subsequent queries will be performed as the stream
    * is read if they are needed.  This query does not obtain any of the attributes but
@@ -103,22 +94,7 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
    * This the exact analog of using the 'Query' request without specifying a query
    * expression.
    */
-  def items: Stream[Item] = query(None)
-
-  private def query(expression: Option[String]): Stream[Item] = {
-    def generate(res: QueryResponse): Stream[Item] =
-      streamOfObjects[Item, String](res.result.itemNames.toList, item)
-
-    def responses(req: QueryRequest, res: QueryResponse): Stream[QueryResponse] = {
-      Stream.cons(res, QueryRequest.next(req, res) match {
-        case None => Stream.empty
-        case Some(request) => responses(request, request.response)
-      })
-    }
-
-    val start = QueryRequest.start(name, expression)
-    streamOfStreams(responses(start, start.response), generate)
-  }
+  def items: Stream[Item] = api.items("itemName() from `%s`".format(name), this)
 
   /**
    * Return a stream containing all of the items within the domain with all of their
@@ -171,19 +147,10 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
   * This is the analog of using the 'QueryWithAttributes' request.
   */
  def withAttributes(expression: Option[String], attributes: Set[String]): Stream[ItemSnapshot] = {
-   def convert(i: QueryWithAttributesResult#Item) = new ItemSnapshot(item(i.name), i.attributes)
-
-   def generate(res: QueryWithAttributesResponse): Stream[ItemSnapshot] =
-     streamOfObjects(res.result.items.toList, convert)
-
-   def responses(req: QueryWithAttributesRequest, res: QueryWithAttributesResponse): Stream[QueryWithAttributesResponse] =
-    Stream.cons(res, QueryWithAttributesRequest.next(req, res) match {
-      case None => Stream.empty
-      case Some(request) => responses(request, request.response)
-    })
-
-    val start = QueryWithAttributesRequest.start(name, expression, attributes)
-    streamOfStreams(responses(start, start.response), generate)
+    expression match {
+      case None => select("* from `%s`".format(name), this)
+      case Some(where) => select("* from `%s` where %s".format(name, where), this) 
+    }
   }
 
   /**
@@ -289,7 +256,7 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
 
   /** Add multiple values to this attribute by specifying a series of mappings. */
   def +=(pairs: (String, String)*) = update(combinePairs(false, pairs))
-
+  
   def +=?(condition: PutCondition)(pairs: (String, String)*) = update(combinePairs(false, pairs), condition)
 
   /** Add multiple values to this attribute by specifying a sequence of mappings. */
