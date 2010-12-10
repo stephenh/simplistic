@@ -21,7 +21,7 @@ class QueryParameters(private val m: Map[String,String]) {
   def +(o: QueryParameters): QueryParameters = new QueryParameters(m ++ o.m)
 
   /** Convert a map of query parameters into a url encoded string. */
-  override def toString = m map { a => a._1 + "=" + jencode(a._2) } mkString ("?", "&", "")
+  override def toString = m map { a => a._1 + "=" + jencode(a._2, "UTF-8") } mkString ("?", "&", "")
 }
 
 object QueryParameters {
