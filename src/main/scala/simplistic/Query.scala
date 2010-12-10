@@ -21,12 +21,12 @@ object Query {
   }
 
   case class SortedCombination(target: Combination, name: String) extends Expression {
-    override def toString = target + " sort " + quoteValue(name) + " asc"
+    override def toString = target + " order by " + quoteName(name) + " asc"
     def desc = DescendingSortedCombination(target, name)
   }
 
   case class DescendingSortedCombination(target: Combination, name: String) extends Expression {
-      override def toString = target + " sort "+quoteValue(name) + " desc"
+      override def toString = target + " order by " + quoteName(name) + " desc"
   }
 
   trait Negatable extends Expression
@@ -36,14 +36,12 @@ object Query {
   }
 
   case class DescendingSort(target: Sortable, name: String) extends Expression with Negatable {
-    //TODO: name quoting    
-    override def toString = target.component + " order by " + name + " desc"
+    override def toString = target.component + " order by " + quoteName(name) + " desc"
   }
 
   case class AscendingSort(target: Sortable, name: String) extends Expression with Negatable {
     def desc = DescendingSort(target, name)
-    //TODO: name quoting
-    override def toString = target.component + " order by " + name + " asc"
+    override def toString = target.component + " order by " + quoteName(name) + " asc"
   }
 
   trait Sortable extends Predicate {
@@ -68,8 +66,7 @@ object Query {
   case class Comparison [T](operator: String, attribute: Attribute[T], value: T) extends Predicate with Sortable {
     def component = {
       val (name, converted) = attribute(value)
-      // TODO: name should really be quoteName() but fakeSDB doesn't support this...
-      name + " " + operator + " " + quoteValue(converted)
+      quoteName(name) + " " + operator + " " + quoteValue(converted)
     }
   }
 
