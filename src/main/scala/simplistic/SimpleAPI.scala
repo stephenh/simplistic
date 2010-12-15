@@ -247,7 +247,7 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
    *
    * This is the analog of the 'PutAttributes' request.
    */
-  def update(values: Map[String, (Set[String], Boolean)], conditional:PutCondition = NoCondition) = {
+  def update(values: Map[String, (Set[String], Boolean)], conditional: PutCondition = NoCondition) = {
     (new PutAttributesRequest(domain.name, name, values, conditional)).response.metadata
   }
 
@@ -291,6 +291,11 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
    * Replace the values of multiple attributes in this item with a series of mappings.
    */
   def set(pairs: (String,String)*) = update(combinePairs(true, pairs))
+
+  /**
+   * Conditionally replace the values of multiple attributes in this item with a series of mappings.
+   */
+  def setIf(condition: PutCondition)(pairs: (String,String)*) = update(combinePairs(true, pairs), condition)
 
   /**
    * Replace the values of multiple attributes in this item with a series of mappings.

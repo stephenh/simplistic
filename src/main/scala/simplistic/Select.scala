@@ -31,7 +31,7 @@ object Select {
   }
 
   trait Expression extends LimitableExpression {
-    def order_by[T](a: Attribute[T])  = AscendingOrder(this, a)
+    def orderBy[T](a: Attribute[T])  = AscendingOrder(this, a)
     def queryString: String
   }
 
@@ -99,24 +99,28 @@ object Select {
 
     // provides
     def comparison(op: String, value: T) = BasicComparison(op, this, value)
+    def ===(value: T) = is(value)
     def is(value: T) = comparison("=", value)
-    def is_not(value: T) = comparison("!=", value)
+    def !==(value: T) = isNot(value)
+    def isNot(value: T) = comparison("!=", value)
     def >(value: T) = comparison(">", value)
     def >=(value: T) = comparison(">=", value)
     def <(value: T) = comparison("<", value)
     def <=(value: T) = comparison("<=", value)
     def like(value: String) = StringComparison("like", this, value)
-    def not_like(value: String) = StringComparison("not like", this, value)
+    def notLike(value: String) = StringComparison("not like", this, value)
     def between(value: T) = BetweenLHS(this, value)
     def in(value: T*) = In[T](this, value: _*)
-    def is_null = Unary("is null", this)
-    def is_not_null = Unary("is not null", this)
+    def isNull = Unary("is null", this)
+    def isNotNull = Unary("is not null", this)
   }
 
   class SelectAttribute[T](a: Attribute[T]) extends Comparable[T] {
     def conversion = a.conversion
     def name = a.name
   }
+
+  implicit def toSelectAttribute[T](a: Attribute[T]): SelectAttribute[T] = new SelectAttribute(a)
 
   class Every[T](a: Attribute[T]) extends Comparable[T] {
     def conversion = a.conversion
@@ -139,13 +143,13 @@ object Select {
 
     val itemName = "itemName() "
 
-    def apply(a: NamedAttribute*)(e: FromExpression): Stream[ItemSnapshot] = {
+    def select(a: NamedAttribute*)(e: FromExpression): Stream[ItemSnapshot] = {
       d.api.select(names(a: _*) + from(d) + whereClause(e), d)
     }
 
-    def apply(e: FromExpression): Stream[ItemSnapshot] = where(e)
+    def select(e: FromExpression): Stream[ItemSnapshot] = d.api.select(all + from(d) + whereClause(e), d)
 
-    def where(e: FromExpression): Stream[ItemSnapshot] = d.api.select(all + from(d) + whereClause(e), d)
+    def first(expression: LimitableExpression): Option[ItemSnapshot] = select(expression limit 1).headOption
 
     /**
      * Return the integer count of items within the domain that match the supplied
@@ -157,7 +161,7 @@ object Select {
      * Return a stream of items matching the supplied expression.  These are items without
      * attributes associated with then.
      */
-    def itemsWhere(e: Expression): Stream[Item] = d.api.items(itemName + from(d) + whereClause(e), d)
+    def items(e: Expression): Stream[Item] = d.api.items(itemName + from(d) + whereClause(e), d)
 
     def count: Int = count(EmptyExpression)
   }
@@ -187,7 +191,7 @@ object Select {
 
   class AttributeSelection(val api: SimpleAPI, val queryString: String) {
     def from(d: Domain) = new SourceSelection(this, d)
-   def from(name: String) = new SourceSelection(this, api.domain(name))
+    def from(name: String) = new SourceSelection(this, api.domain(name))
   }
 
   class CountSelection(val api: SimpleAPI) {
