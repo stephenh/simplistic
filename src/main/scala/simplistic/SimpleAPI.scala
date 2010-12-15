@@ -149,7 +149,7 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
  def withAttributes(expression: Option[String], attributes: Set[String]): Stream[ItemSnapshot] = {
     expression match {
       case None => select("* from `%s`".format(name), this)
-      case Some(where) => select("* from `%s` where %s".format(name, where), this) 
+      case Some(where) => select("* from `%s` where %s".format(name, where), this)
     }
   }
 
@@ -256,7 +256,7 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
 
   /** Add multiple values to this attribute by specifying a series of mappings. */
   def +=(pairs: (String, String)*) = update(combinePairs(false, pairs))
-  
+
   def +=?(condition: PutCondition)(pairs: (String, String)*) = update(combinePairs(false, pairs), condition)
 
   /** Add multiple values to this attribute by specifying a sequence of mappings. */
@@ -298,7 +298,10 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
   def setSeq(pairs: Seq[(String, String)]) = update(combinePairs(true, pairs))
 
   /** Delete all of the attributes in this item. */
-  def clear = new DeleteAttributesRequest(domain.name, name, Map()).response.metadata
+  def clear() = new DeleteAttributesRequest(domain.name, name, Map()).response.metadata
+
+  /** Delete the item -- equivalent to clear() */
+  def delete() = new DeleteAttributesRequest(domain.name, name, Map()).response.metadata
 
   /** Delete a single attribute value pair in this item. */
   def -=(pair: (String, String)) = {
