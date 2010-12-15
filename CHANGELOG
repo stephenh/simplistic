@@ -3,6 +3,11 @@
  * Added: Single required/optional and multi-valued attributes (Larry Ogrodnek)
  * Added: Conditional put support (Larry Ogrodnek)
  * Added: QueryableDomain.findFirst(Expression)
+ * Removed: Query API (was experimental; now use Select API exclusively)
+ * Changed: Use camelCase method names (e.g. order_by => orderBy)
+ * Changed: domain.apply(expression) replaced by domain.select(expression)
+ * Added: domain.first(expression) that uses "limit 1" under the hood
+ * Added: conditional put variant domain.setIf(condition)(attributes) 
 
 1.0.0 (2010-11-24)
  * Forked, cleaned up and ported to Scala 2.8.0.
