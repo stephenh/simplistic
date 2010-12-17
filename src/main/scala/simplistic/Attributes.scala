@@ -90,11 +90,11 @@ object Attributes {
 
   trait AttributeToPutConditionBuilder[T] {
     def doesNotExist: PutConditions.DoesNotExist
-    def ===(value: T): PutConditions.Equals
+    def stillEquals(value: T): PutConditions.Equals
   }
 
   implicit def attributeToPutCondition[T](attr: Attribute[T]) = new AttributeToPutConditionBuilder[T] {
     override def doesNotExist = PutConditions.DoesNotExist(attr.name)
-    override def ===(value: T) = PutConditions.Equals(attr.name, attr.conversion(value))
+    override def stillEquals(value: T) = PutConditions.Equals(attr.name, attr.conversion(value))
   }
 }
