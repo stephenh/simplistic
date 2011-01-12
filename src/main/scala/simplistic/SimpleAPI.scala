@@ -264,12 +264,14 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
 
   private def combinePairs(replace: Boolean, pairs: Seq[(String, String)]): Map[String, (Set[String], Boolean)] = {
     def combine(map: Map[String,(Set[String], Boolean)], pair: (String, String)): Map[String,(Set[String], Boolean)] =
-      if (map.contains(pair._1))
-        map ++ Map(pair._1 -> (map(pair._1)._1 + pair._2 -> replace))
-      else
-        map ++ Map(pair._1 -> (Set[String](pair._2) -> replace))
+      if (pair._2 != null) {
+        if (map.contains(pair._1))
+          map ++ Map(pair._1 -> (map(pair._1)._1 + pair._2 -> replace))
+        else
+          map ++ Map(pair._1 -> (Set[String](pair._2) -> replace))
+      } else map
 
-      (Map[String,(Set[String], Boolean)]() /: pairs) (combine(_, _))
+    (Map[String,(Set[String], Boolean)]() /: pairs) (combine(_, _))
   }
 
   /** Add multiple values to an attribute of this item. */
