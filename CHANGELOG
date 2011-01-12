@@ -1,4 +1,8 @@
-1.1 (Pending)
+1.0.7 (2011-01-11)
+ * Fixed: Prevent NPE if null-valued attributes are set.
+          Null attributes are now ignored and equivalent to no attribute.
+
+1.0.6 and before:
  * Added: Test suites using FakeSDB as backend.
  * Added: Single required/optional and multi-valued attributes (Larry Ogrodnek)
  * Added: Conditional put support (Larry Ogrodnek)
@@ -7,7 +11,7 @@
  * Changed: Use camelCase method names (e.g. order_by => orderBy)
  * Changed: domain.apply(expression) replaced by domain.select(expression)
  * Added: domain.first(expression) that uses "limit 1" under the hood
- * Added: conditional put variant domain.setIf(condition)(attributes) 
+ * Added: conditional put variant domain.setIf(condition)(attributes)
  * Added: Item.delete() as alias to clear()
 
 1.0.0 (2010-11-24)
