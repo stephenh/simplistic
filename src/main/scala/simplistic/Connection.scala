@@ -44,7 +44,7 @@ private class ConnectionPool {
   }
 }
 
-class Connection(val awsAccessKeyId:String, awsSecretKey:String, val url: String) {
+class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: String) {
   import Exceptions.toException
   import org.apache.commons.httpclient.methods.{GetMethod, PostMethod}
 
@@ -53,8 +53,9 @@ class Connection(val awsAccessKeyId:String, awsSecretKey:String, val url: String
 
   @transient var trace = false
 
-  def makeRequest (request:SimpleDBRequest) :Elem = {
+  def makeRequest(request: SimpleDBRequest): Elem = {
     if (trace) diagnose(request.parameters)
+
     val method = new PostMethod(url + QueryParameters(signer.sign(request.parameters)))
 
     pool.exec { c =>
@@ -63,8 +64,7 @@ class Connection(val awsAccessKeyId:String, awsSecretKey:String, val url: String
       method.releaseConnection
       if (trace) diagnose(xml)
       xml match {
-        case Error(code, message, boxUsage) =>
-          throw toException(code, message, boxUsage)
+        case Error(code, message, boxUsage) => throw toException(code, message, boxUsage)
         case _ => xml
       }
     }
@@ -72,13 +72,11 @@ class Connection(val awsAccessKeyId:String, awsSecretKey:String, val url: String
 
   def printer = new PrettyPrinter(80, 2)
 
-  def diagnose (xml:Node) {
+  def diagnose(xml: Node) {
     Console.println(printer.format(xml))
   }
 
-  def diagnose (parameters:Map[String, String]) {
-    Console.println(
-        (parameters.keys map (k => k + ": "+parameters(k))) mkString "\n"
-    )
+  def diagnose(parameters: Map[String, String]) {
+    Console.println(parameters.keys map (k => k + ": " + parameters(k)) mkString "\n")
   }
 }
