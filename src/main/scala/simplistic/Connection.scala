@@ -56,18 +56,38 @@ class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: Stri
   def makeRequest(request: SimpleDBRequest): Elem = {
     if (trace) diagnose(request.parameters)
 
-    val method = new PostMethod(url + QueryParameters(signer.sign(request.parameters)))
+    retryIfUnavailable {
+      val method = new PostMethod(url + QueryParameters(signer.sign(request.parameters)))
 
-    pool.exec { c =>
-      c.executeMethod(method)
-      val xml = XML.load(method.getResponseBodyAsStream())
-      method.releaseConnection
-      if (trace) diagnose(xml)
-      xml match {
-        case Error(code, message, boxUsage) => throw toException(code, message, boxUsage)
-        case _ => xml
+      pool.exec { c =>
+        c.executeMethod(method)
+        val xml = XML.load(method.getResponseBodyAsStream())
+        method.releaseConnection
+        if (trace) diagnose(xml)
+        xml match {
+          case Error(code, message, boxUsage) => throw toException(code, message, boxUsage)
+          case _ => xml
+        }
       }
     }
+  }
+
+  private def retryIfUnavailable[T](f: => T): T = {
+    import Exceptions.ServiceUnavailable
+
+    var retriesLeft = 10
+    var delay = 50 // milliseconds
+    while (true) {
+      try {
+        return f
+      } catch {
+        case e: ServiceUnavailable if retriesLeft > 0 =>
+          retriesLeft -= 1
+          delay *= 2 // exponential backoff
+          Thread.sleep(delay)
+      }
+    }
+    error("unreachable")
   }
 
   def printer = new PrettyPrinter(80, 2)
