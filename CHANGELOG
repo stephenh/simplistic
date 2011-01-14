@@ -1,3 +1,8 @@
+1.0.9 (2011-01-13)
+ * Fixed: Attribute removal: Item.-=() was incorrectly passing attributeName in
+          place of itemName.
+ * Added: Item.attribute() and -=() now accept an Attribute as well as String.
+
 1.0.8 (2011-01-12)
  * Added: Automatic retry with exponential backoff if SimpleDB returns
           ServiceUnavailable error
