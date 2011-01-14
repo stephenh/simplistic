@@ -4,10 +4,6 @@ import Conversions._
 
 object Attributes {
 
-  trait NamedAttribute {
-    val name: String
-  }
-
   trait Attribute[T] {
     val name: String
     val conversion: Conversion[T]
@@ -80,11 +76,11 @@ object Attributes {
 
 
   /** Create an optional attribute that's not multi-valued */
-  def optionalAttribute[T](name: String) = OptionalSingleValuedAttribute(name, Conversions.PassThrough)
+  def optionalAttribute(name: String) = OptionalSingleValuedAttribute(name, Conversions.PassThrough)
   def optionalAttribute[T](name: String, conversion: Conversion[T]) = OptionalSingleValuedAttribute[T](name, conversion)
 
   /** Create a non-multi-valued attribute that's required */
-  def attribute[T](name: String) = RequiredSingleValuedAttribute(name, Conversions.PassThrough)
+  def attribute(name: String) = RequiredSingleValuedAttribute(name, Conversions.PassThrough)
   def attribute[T](name: String, conversion: Conversion[T]) = RequiredSingleValuedAttribute[T](name, conversion)
 
 

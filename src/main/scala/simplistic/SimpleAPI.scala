@@ -229,6 +229,8 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
       .response.result.attributes(attributeName)
   }
 
+  def attribute(attribute: Attribute) = this.attribute(attribute.name)
+
   private def putAttribute(pair: (String, String), replace: Boolean) = {
     (new PutAttributesRequest(domain.name, name, Map(pair._1 -> (Set(pair._2) -> replace))))
       .response.metadata
@@ -318,9 +320,11 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
 
   /** Delete a single attribute in this item. */
   def -=(attributeName: String) = {
-    (new DeleteAttributesRequest(domain.name, attributeName, Map(name -> Set())))
+    (new DeleteAttributesRequest(domain.name, name, Map(attributeName -> Set())))
       .response.metadata
   }
+
+  def -=(attribute: Attribute) = this.-=(attribute.name)
 
   /** Supply an object that can be used to create batch operations. */
   lazy val batch = new Batch(name)
