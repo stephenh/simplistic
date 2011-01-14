@@ -1,7 +1,7 @@
 Simplistic: Scala Bindings for SimpleDB (Amazon Web Services)
 =============================================================
 
-This is a fork of <http://github.com/rbarooah/simpledb-scala-binding> to clean up the code, port to Scala 2.8.0 and add a few features.
+This is a fork of <http://github.com/rbarooah/simpledb-scala-binding> that cleans up the code, port to Scala 2.8.0+, fix bugs and add new features (such as conditional put).
 
 See CHANGELOG for details.
 
