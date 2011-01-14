@@ -132,7 +132,7 @@ object Select {
   implicit def toSelectableDomain(d: Domain): SelectableDomain = new SelectableDomain(d)
 
   // Building elements of the query syntax
-  private[Select] def names(attributes: Attribute*) = (attributes map (_.name) mkString ", ") + " "
+  private[Select] def names(attributes: Attribute[_]*) = (attributes map (_.name) mkString ", ") + " "
 
   private[Select] def whereClause(e: FromExpression) = "where " + e.queryString
 
@@ -143,7 +143,7 @@ object Select {
 
     val itemName = "itemName() "
 
-    def select(a: Attribute*)(e: FromExpression): Stream[ItemSnapshot] = {
+    def select(a: Attribute[_]*)(e: FromExpression): Stream[ItemSnapshot] = {
       d.api.select(names(a: _*) + from(d) + whereClause(e), d)
     }
 

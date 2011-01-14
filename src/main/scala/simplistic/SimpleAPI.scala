@@ -199,6 +199,7 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
 {
   import api._
   import PutConditions._
+  import Attributes.Attribute
 
   /** Return a string assocating this item with it's domain in the form "domain.item" */
   def path = domain + "." + name
@@ -224,12 +225,12 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
   )
 
   /** Read a single attribute from this item. */
-  def attribute(attributeName: String) = {
+  def attribute(attributeName: String): Set[String] = {
     (new GetAttributesRequest(domain.name, name, Set(attributeName)))
       .response.result.attributes(attributeName)
   }
 
-  def attribute(attribute: Attribute) = this.attribute(attribute.name)
+  def attribute(attribute: Attribute[_]): Set[String] = this.attribute(attribute.name)
 
   private def putAttribute(pair: (String, String), replace: Boolean) = {
     (new PutAttributesRequest(domain.name, name, Map(pair._1 -> (Set(pair._2) -> replace))))
@@ -319,12 +320,12 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
   }
 
   /** Delete a single attribute in this item. */
-  def -=(attributeName: String) = {
+  def -=(attributeName: String): ResponseMetadata = {
     (new DeleteAttributesRequest(domain.name, name, Map(attributeName -> Set())))
       .response.metadata
   }
 
-  def -=(attribute: Attribute) = this.-=(attribute.name)
+  def -=(attribute: Attribute[_]): ResponseMetadata = this.-=(attribute.name)
 
   /** Supply an object that can be used to create batch operations. */
   lazy val batch = new Batch(name)
