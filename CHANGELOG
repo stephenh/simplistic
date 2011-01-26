@@ -1,3 +1,10 @@
+1.0.10 (2011-01-25)
+ * Fixed: Multiple attribute retrieval: Item.attributes(Set[String]) was
+          incorrectly returning all attributes, not just those requested.
+ * Fixed: Item.attribute(attributeName) would throw a NoSuchElementException
+          if the item didn't have any value.  It now correctly returns an empty
+          Set.
+
 1.0.9 (2011-01-13)
  * Fixed: Attribute removal: Item.-=() was incorrectly passing attributeName in
           place of itemName.

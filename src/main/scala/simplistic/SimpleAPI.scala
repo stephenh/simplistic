@@ -221,13 +221,13 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
   /** Read a selection of attributes from this item */
   def attributes(attributes: Set[String]) = new ItemSnapshot(
     this,
-    (new GetAttributesRequest(domain.name, name, Set())).response.result.attributes
+    (new GetAttributesRequest(domain.name, name, attributes)).response.result.attributes
   )
 
   /** Read a single attribute from this item. */
   def attribute(attributeName: String): Set[String] = {
     (new GetAttributesRequest(domain.name, name, Set(attributeName)))
-      .response.result.attributes(attributeName)
+      .response.result.attributes.get(attributeName) getOrElse (Set.empty)
   }
 
   def attribute(attribute: Attribute[_]): Set[String] = this.attribute(attribute.name)
