@@ -25,11 +25,16 @@ define "simplistic" do
   project.version = VERSION_NUMBER
   project.group = "simplistic"
 
-  compile.with(HTTPCLIENT, CODEC, POOL).using(:deprecation => true)
+  compile.with HTTPCLIENT, CODEC, POOL
+  compile.using :deprecation => true,
+                :other => ['-unchecked', '-Xprint-types']
 
   test.using :scalatest
   test.with FAKESDB, LOG4J, SLF4J
 
+  doc.using :scaladoc
+
   package :jar
+  package :scaladoc
 end
 
