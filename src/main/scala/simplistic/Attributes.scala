@@ -28,14 +28,11 @@ object Attributes {
      */
     def apply(result: scala.collection.Map[String, Set[String]]): List[T] =
       if (! result.contains(name)) List.empty
-      else (result(name) flatMap {
-        case conversion(value) => List(value)
-        case _ => List.empty
-      }).toList
+      else result(name).toList flatMap conversion.unapply
   }
 
   trait SingleValuedAttribute[T] extends Attribute[T] {
-    def apply(expected: Option[T]): Tuple2[String, Option[String]] = {
+    def apply(expected: Option[T]): (String, Option[String]) = {
       (name -> (expected map conversion.apply))
     }
   }
