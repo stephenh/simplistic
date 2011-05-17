@@ -22,15 +22,15 @@ import org.apache.commons.pool._
 import org.apache.commons.pool.impl._
 
 private class ConnectionProvider extends BasePoolableObjectFactory {
-  override def makeObject () = new HttpClient()
+  override def makeObject() = new HttpClient()
 }
 
 trait ConnectionPool {
-  def exec[T] (f: HttpClient => T): T
+  def exec[T](f: HttpClient => T): T
 }
 
 class NonPoolingConnectionPool(connectionProvider: BasePoolableObjectFactory = new ConnectionProvider) extends ConnectionPool {
-  override def exec[T] (f: HttpClient => T): T = {
+  override def exec[T](f: HttpClient => T): T = {
     return f(connectionProvider.makeObject.asInstanceOf[HttpClient])
   }
 }
@@ -44,7 +44,7 @@ class DefaultConnectionPool(connectionProvider: BasePoolableObjectFactory = new 
     p
   }
 
-  override def exec[T] (f: HttpClient => T): T = {
+  override def exec[T](f: HttpClient => T): T = {
     val client = pool.borrowObject.asInstanceOf[HttpClient]
     try {
       return f(client)
