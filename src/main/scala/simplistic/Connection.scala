@@ -17,66 +17,71 @@ package simplistic
 import Request._
 import scala.xml._
 
-import org.apache.commons.httpclient.HttpClient
-import org.apache.commons.pool._
-import org.apache.commons.pool.impl._
+import org.apache.http.HttpResponse
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params._
+import org.apache.http.client.methods.HttpPost
 
-private class ConnectionProvider extends BasePoolableObjectFactory {
-  override def makeObject() = new HttpClient()
+class ClientConfiguration {
+  val maxConnections: Int = 50
+  val socketTimeout: Int = 50 * 1000
+  val connectionTimeout: Int = 50 * 1000
+  val maxErrorRetry: Int = 10
+  val socketLinger: Int = -1
 }
 
-trait ConnectionPool {
-  def exec[T](f: HttpClient => T): T
-}
+object HttpClientFactory {
+  def createHttpClient(config: ClientConfiguration): HttpClient = {
+    val clientParams = new BasicHttpParams
+    HttpConnectionParams.setConnectionTimeout(clientParams, config.connectionTimeout)
+    HttpConnectionParams.setSoTimeout(clientParams, config.socketTimeout)
+    HttpConnectionParams.setStaleCheckingEnabled(clientParams, true)
+    HttpConnectionParams.setTcpNoDelay(clientParams, true)
 
-class NonPoolingConnectionPool(connectionProvider: BasePoolableObjectFactory = new ConnectionProvider) extends ConnectionPool {
-  override def exec[T](f: HttpClient => T): T = {
-    return f(connectionProvider.makeObject.asInstanceOf[HttpClient])
-  }
-}
-
-class DefaultConnectionPool(connectionProvider: BasePoolableObjectFactory = new ConnectionProvider) extends ConnectionPool {
-  private val pool = {
-    val p = new GenericObjectPool(connectionProvider)
-    p.setMaxActive(-1)
-    p.setMaxIdle(100)
-    p.setTimeBetweenEvictionRunsMillis(5 * 60 * 100) // 5 minute eviction runs
-    p
-  }
-
-  override def exec[T](f: HttpClient => T): T = {
-    val client = pool.borrowObject.asInstanceOf[HttpClient]
-    try {
-      return f(client)
-    } finally {
-      pool.returnObject(client)
+    if (config.socketLinger >= 0) {
+      HttpConnectionParams.setLinger(clientParams, config.socketLinger)
     }
+
+    val connectionManager = new ThreadSafeClientConnManager
+    connectionManager.setDefaultMaxPerRoute(config.maxConnections)
+    connectionManager.setMaxTotal(config.maxConnections)
+
+    new DefaultHttpClient(connectionManager, clientParams)
   }
 }
 
-class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: String, val pool: ConnectionPool) {
+class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: String, val config: ClientConfiguration = new ClientConfiguration) {
   import Exceptions.toException
-  import org.apache.commons.httpclient.methods.{GetMethod, PostMethod}
 
   private val signer = new Signer(awsSecretKey)
 
   @transient var trace = false
 
+  val client = HttpClientFactory.createHttpClient(config)
+
   def makeRequest(request: SimpleDBRequest): Elem = {
     if (trace) diagnose(request.parameters)
 
     retryIfUnavailable {
-      val method = new PostMethod(url + QueryParameters(signer.sign(request.parameters)))
+      val method = new HttpPost(url + QueryParameters(signer.sign(request.parameters)))
+      var response: HttpResponse = null
 
-      pool.exec { c =>
-        c.executeMethod(method)
-        val xml = XML.load(method.getResponseBodyAsStream())
-        method.releaseConnection
-        if (trace) diagnose(xml)
+      try {
+	response = client.execute(method)
+	val xml = XML.load(response.getEntity.getContent)
+	if (trace) diagnose(xml)
         xml match {
           case Error(code, message, boxUsage) => throw toException(code, message, boxUsage)
           case _ => xml
         }
+      } finally {
+	try {
+	  method.getEntity.getContent.close
+	} catch {
+	  case _ => { }
+	}
       }
     }
   }
@@ -84,7 +89,7 @@ class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: Stri
   private def retryIfUnavailable[T](f: => T): T = {
     import Exceptions.ServiceUnavailable
 
-    var retriesLeft = 10
+    var retriesLeft = config.maxErrorRetry
     var delay = 50 // milliseconds
     while (true) {
       try {

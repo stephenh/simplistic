@@ -3,10 +3,13 @@ require 'buildr/scala'
 VERSION_NUMBER = "1.0.10"
 
 repositories.remote << "http://www.ibiblio.org/maven2/"
+repositories.remote << "http://repo1.maven.org/maven2/"
 
-HTTPCLIENT = 'commons-httpclient:commons-httpclient:jar:3.1'
+HTTPCLIENT = 'org.apache.httpcomponents:httpclient:jar:4.1.1'
+HTTPCORE = 'org.apache.httpcomponents:httpcore:jar:4.1'
+COMMONSLOG = 'commons-logging:commons-logging:jar:1.1.1'
+
 CODEC = 'commons-codec:commons-codec:jar:1.3'
-POOL = 'commons-pool:commons-pool:jar:1.4'
 
 SLF4J_VERSION = "1.5.6"
 SLF4J = [
@@ -25,7 +28,7 @@ define "simplistic" do
   project.version = VERSION_NUMBER
   project.group = "simplistic"
 
-  compile.with HTTPCLIENT, CODEC, POOL
+  compile.with HTTPCORE, HTTPCLIENT, CODEC, COMMONSLOG
   compile.using :deprecation => true,
                 :other => ['-unchecked', '-Xprint-types']
 
