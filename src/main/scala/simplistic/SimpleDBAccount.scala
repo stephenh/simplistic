@@ -28,10 +28,11 @@ object SimpleDBAccount {
 class SimpleDBAccount(
   val awsAccessKeyId: String,
   awsSecretKey: String,
-  val url: String = SimpleDBAccount.defaultURL
+  val url: String = SimpleDBAccount.defaultURL,
+  val connectionPool: ConnectionPool = new DefaultConnectionPool
 ) extends SimpleAPI {
 
-  val connection = new Connection(awsAccessKeyId, awsSecretKey, url)
+  val connection = new Connection(awsAccessKeyId, awsSecretKey, url, connectionPool)
 
   def doRequest(req: SimpleDBRequest): Elem = connection.makeRequest(req)
 }

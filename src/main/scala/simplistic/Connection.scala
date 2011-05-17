@@ -25,16 +25,26 @@ private class ConnectionProvider extends BasePoolableObjectFactory {
   override def makeObject () = new HttpClient()
 }
 
-private class ConnectionPool {
+trait ConnectionPool {
+  def exec[T] (f: HttpClient => T): T
+}
+
+class NonPoolingConnectionPool(connectionProvider: BasePoolableObjectFactory = new ConnectionProvider) extends ConnectionPool {
+  override def exec[T] (f: HttpClient => T): T = {
+    return f(connectionProvider.makeObject.asInstanceOf[HttpClient])
+  }
+}
+
+class DefaultConnectionPool(connectionProvider: BasePoolableObjectFactory = new ConnectionProvider) extends ConnectionPool {
   private val pool = {
-    val p = new GenericObjectPool(new ConnectionProvider)
+    val p = new GenericObjectPool(connectionProvider)
     p.setMaxActive(-1)
     p.setMaxIdle(100)
     p.setTimeBetweenEvictionRunsMillis(5 * 60 * 100) // 5 minute eviction runs
     p
   }
 
-  def exec[T] (f: HttpClient => T): T = {
+  override def exec[T] (f: HttpClient => T): T = {
     val client = pool.borrowObject.asInstanceOf[HttpClient]
     try {
       return f(client)
@@ -44,12 +54,11 @@ private class ConnectionPool {
   }
 }
 
-class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: String) {
+class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: String, val pool: ConnectionPool) {
   import Exceptions.toException
   import org.apache.commons.httpclient.methods.{GetMethod, PostMethod}
 
   private val signer = new Signer(awsSecretKey)
-  private val pool = new ConnectionPool()
 
   @transient var trace = false
 
