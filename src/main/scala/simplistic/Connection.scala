@@ -69,19 +69,19 @@ class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: Stri
       var response: HttpResponse = null
 
       try {
-	response = client.execute(method)
-	val xml = XML.load(response.getEntity.getContent)
-	if (trace) diagnose(xml)
+        response = client.execute(method)
+        val xml = XML.load(response.getEntity.getContent)
+        if (trace) diagnose(xml)
         xml match {
           case Error(code, message, boxUsage) => throw toException(code, message, boxUsage)
           case _ => xml
         }
       } finally {
-	try {
-	  method.getEntity.getContent.close
-	} catch {
-	  case _ => { }
-	}
+        try {
+          method.getEntity.getContent.close
+        } catch {
+          case _: Exception => // ignore
+        }
       }
     }
   }
