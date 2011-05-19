@@ -1,3 +1,6 @@
+1.0.11 (2011-05-19)
+ * Rework connection management based on HttpClient 4.1.1 (Larry Ogrodnek)
+
 1.0.10 (2011-01-25)
  * Fixed: Multiple attribute retrieval: Item.attributes(Set[String]) was
           incorrectly returning all attributes, not just those requested.
