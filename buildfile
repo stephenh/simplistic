@@ -1,6 +1,6 @@
 require 'buildr/scala'
 
-VERSION_NUMBER = "1.0.12"
+VERSION_NUMBER = "1.0.13-SNAPSHOT"
 
 repositories.remote << "http://www.ibiblio.org/maven2/"
 repositories.remote << "http://repo1.maven.org/maven2/"
