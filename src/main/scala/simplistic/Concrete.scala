@@ -92,6 +92,7 @@ trait Concrete {
 
   class SelectRequest(
     val selectExpression: String,
+    val consistency: Consistency,
     val nextToken: Option[String],
     val maxNumberOfItems: Option[Int]
   ) extends Select with Basics {
@@ -99,9 +100,10 @@ trait Concrete {
   }
 
   object SelectRequest {
-    def start(selectExpression: String) = new SelectRequest(selectExpression, None, None)
+    def start(selectExpression: String, consistency: Consistency) =
+      new SelectRequest(selectExpression, consistency, None, None)
 
     def next(req: SelectRequest, res: SelectResponse): Option[SelectRequest] =
-      res.result.nextToken map { token => new SelectRequest(req.selectExpression, Some(token), None) }
+      res.result.nextToken map { token => new SelectRequest(req.selectExpression, req.consistency, Some(token), None) }
   }
 }

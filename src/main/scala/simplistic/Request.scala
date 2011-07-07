@@ -50,10 +50,10 @@ object Request {
     def action = "ListDomains"
     def maxNumberOfDomains:Option[Int]
     def nextToken:Option[String]
-    def specificParameters = {
-      optional("MaxNumberOfDomains", maxNumberOfDomains) ++
+    def specificParameters = Seq(
+      optional("MaxNumberOfDomains", maxNumberOfDomains),
       optional("NextToken", nextToken)
-    }
+    ).flatten.toMap
   }
 
   trait DomainMetadata extends SimpleDBRequest {
@@ -232,15 +232,18 @@ object Request {
       import Attributes._
 
       def action = "Select"
-      def maxNumberOfItems: Option[Int]
-      def nextToken: Option[String]
       def selectExpression: String
+      def consistency: Consistency
+      def nextToken: Option[String]
+      def maxNumberOfItems: Option[Int]
 
-      def specificParameters = {
-        Map[String, String]("SelectExpression" -> selectExpression) ++
-          optional("MaxNumberOfItems", maxNumberOfItems) ++
+      def specificParameters =
+        Seq(
+          Some("SelectExpression" -> selectExpression),
+          Some("ConsistentRead" -> (if (consistency == ConsistentRead) "true" else "false")),
+          optional("MaxNumberOfItems", maxNumberOfItems),
           optional("NextToken", nextToken)
-      }
+        ).flatten.toMap
   }
 
   object Attributes {
@@ -257,10 +260,8 @@ object Request {
       coded
     }
 
-    def optional[T](name: String, value: Option[T]): Map[String, String] = value match {
-      case Some(v) => Map(name -> v.toString)
-      case None => Map.empty
-    }
+    def optional[T](name: String, value: Option[T]): Option[(String, String)] =
+      value map { v => (name, v.toString) }
   }
 }
 

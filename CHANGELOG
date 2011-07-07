@@ -1,3 +1,6 @@
+1.0.12 (2011-07-07)
+ * Add implicit consistency parameter on read operations.
+
 1.0.11 (2011-05-19)
  * Rework connection management based on HttpClient 4.1.1 (Larry Ogrodnek)
 

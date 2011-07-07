@@ -94,7 +94,7 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
    * This the exact analog of using the 'Query' request without specifying a query
    * expression.
    */
-  def items: Stream[Item] = api.items("itemName() from `%s`".format(name), this)
+  def items(implicit consistency: Consistency): Stream[Item] = api.items("itemName() from `%s`".format(name), this)
 
   /**
    * Return a stream containing all of the items within the domain with all of their
@@ -104,7 +104,7 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
    * This is the analog of using the 'QueryWithAttributes' request without specifying a
    * query expression.
    */
-  def itemsWithAttributes: Stream[ItemSnapshot] = withAttributes(Set[String]())
+  def itemsWithAttributes(implicit consistency: Consistency): Stream[ItemSnapshot] = withAttributes(Set[String]())
 
   /**
    * Return a stream containing the items matching a given query with all of their
@@ -114,7 +114,8 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
    * This is the analog of using the 'QueryWithAttributes' request with a query expression
    * but no list of attributes.
    */
-  def withAttributes(expression: String): Stream[ItemSnapshot] = withAttributes(Some(expression), Set[String]())
+  def withAttributes(expression: String)(implicit consistency: Consistency): Stream[ItemSnapshot] =
+    withAttributes(Some(expression), Set[String]())
 
   /**
    * Return a stream containing all of the items within a domain with a selected set of
@@ -124,7 +125,8 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
    * This is the analog of using the 'QueryWithAttributes' request without a query
    * expression but with a list of attributes.
    */
-  def withAttributes(attributes: Set[String]): Stream[ItemSnapshot] = withAttributes(None, attributes)
+  def withAttributes(attributes: Set[String])(implicit consistency: Consistency): Stream[ItemSnapshot] =
+    withAttributes(None, attributes)
 
  /**
   * Return a stream containing the items matching a given query with a selected set of
@@ -134,7 +136,7 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
   * This is the analog of using the 'QueryWithAttributes' request with a query
   * expression and a list of attributes.
   */
- def withAttributes(expression: String, attributes: Set[String]): Stream[ItemSnapshot] =
+ def withAttributes(expression: String, attributes: Set[String])(implicit consistency: Consistency): Stream[ItemSnapshot] =
    withAttributes(Some(expression), attributes)
 
 
@@ -146,7 +148,7 @@ class Domain(val name: String)(implicit val api: SimpleAPI) {
   *
   * This is the analog of using the 'QueryWithAttributes' request.
   */
- def withAttributes(expression: Option[String], attributes: Set[String]): Stream[ItemSnapshot] = {
+ def withAttributes(expression: Option[String], attributes: Set[String])(implicit consistency: Consistency): Stream[ItemSnapshot] = {
     expression match {
       case None => select("* from `%s`".format(name), this)
       case Some(where) => select("* from `%s` where %s".format(name, where), this)
@@ -356,7 +358,7 @@ trait SimpleAPI extends Concrete
    * A single request is made initially, and additional requests are made as needed when the
    * stream is read.
    */
-  def select(expression: String, domain: Domain): Stream[ItemSnapshot] =
+  def select(expression: String, domain: Domain)(implicit consistency: Consistency): Stream[ItemSnapshot] =
     select[ItemSnapshot](i => new ItemSnapshot(domain.item(i.name), i.attributes), expression)
 
   /**
@@ -364,7 +366,7 @@ trait SimpleAPI extends Concrete
    * maps of attributes names to sets of values.  A single request is made initially, and
    * additional requests are made as needed when the stream is read.
    */
-  def select(expression: String): Stream[ItemNameSnapshot] =
+  def select(expression: String)(implicit consistency: Consistency): Stream[ItemNameSnapshot] =
     select[ItemNameSnapshot](i => new ItemNameSnapshot(i.name, i.attributes), expression)
 
   /**
@@ -372,7 +374,7 @@ trait SimpleAPI extends Concrete
    * which contain no attributes.  A single request is made initially and additional requests
    * are made as needed when the stream is read.
    */
-  def items(expression: String, domain: Domain): Stream[Item] =
+  def items(expression: String, domain: Domain)(implicit consistency: Consistency): Stream[Item] =
     select[Item](i => domain.item(i.name), expression)
 
   /**
@@ -380,7 +382,7 @@ trait SimpleAPI extends Concrete
    * the supplied function. A single request is made initially, and additional requests are
    * made as needed when the stream is read.
    */
-  private def select[T](convert: (ItemWithAttributesResult#Item) => T, expression: String): Stream[T] = {
+  private def select[T](convert: (ItemWithAttributesResult#Item) => T, expression: String)(implicit consistency: Consistency): Stream[T] = {
     def generate(res: SelectResponse): Stream[T] =
       streamOfObjects(res.result.items.toList, convert)
 
@@ -391,7 +393,7 @@ trait SimpleAPI extends Concrete
       })
     }
 
-    val start = SelectRequest.start("select "+expression)
+    val start = SelectRequest.start("select "+expression, consistency)
     streamOfStreams(responses(start, start.response), generate)
   }
 

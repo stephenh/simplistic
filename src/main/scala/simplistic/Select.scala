@@ -143,42 +143,45 @@ object Select {
 
     val itemName = "itemName() "
 
-    def select(a: Attribute[_]*)(e: FromExpression): Stream[ItemSnapshot] = {
+    def select(a: Attribute[_]*)(e: FromExpression)(implicit consistency: Consistency): Stream[ItemSnapshot] = {
       d.api.select(names(a: _*) + from(d) + whereClause(e), d)
     }
 
-    def select(e: FromExpression): Stream[ItemSnapshot] = d.api.select(all + from(d) + whereClause(e), d)
+    def select(e: FromExpression)(implicit consistency: Consistency): Stream[ItemSnapshot] = 
+      d.api.select(all + from(d) + whereClause(e), d)
 
-    def first(expression: LimitableExpression): Option[ItemSnapshot] = select(expression limit 1).headOption
+    def first(expression: LimitableExpression)(implicit consistency: Consistency): Option[ItemSnapshot] = 
+      select(expression limit 1).headOption
 
     /**
-     * Return the integer count of items within the domain that match the supplied
-     * expression.
+     * Return the integer count of items within the domain that match the supplied expression.
      */
-    def count(e: Expression): Int = new CountSource(d.api, d).where(e)
+    def count(e: Expression)(implicit consistency: Consistency): Int = 
+      new CountSource(d.api, d, consistency).where(e)
 
     /**
      * Return a stream of items matching the supplied expression.  These are items without
      * attributes associated with then.
      */
-    def items(e: Expression): Stream[Item] = d.api.items(itemName + from(d) + whereClause(e), d)
+    def items(e: Expression)(implicit consistency: Consistency): Stream[Item] = 
+      d.api.items(itemName + from(d) + whereClause(e), d)
 
-    def count: Int = count(EmptyExpression)
+    def count(implicit consistency: Consistency): Int = count(EmptyExpression)
   }
 
-  class SourceSelection(attributes: AttributeSelection, d: Domain) {
+  class SourceSelection(attributes: AttributeSelection, d: Domain, consistency: Consistency) {
     def where(e: FromExpression): Stream[ItemSnapshot] = {
-      d.api.select(attributes.queryString + from(d) + whereClause(e), d)
+      d.api.select(attributes.queryString + from(d) + whereClause(e), d)(consistency)
     }
   }
 
-  class CountSource(api: SimpleAPI, d: Domain) {
+  class CountSource(api: SimpleAPI, d: Domain, consistency: Consistency) {
     private val countValue = multiValued("Count", PositiveInt)
 
     val toCount = "count(*) "
 
     private def values(whereClause: String) =
-      d.api.select(toCount + from(d) + whereClause, d) flatMap { m => countValue(m) }
+      d.api.select(toCount + from(d) + whereClause, d)(consistency) flatMap { m => countValue(m) }
 
     def where(e: Expression): Int = {
       val e2 = e match {
@@ -189,13 +192,13 @@ object Select {
     }
   }
 
-  class AttributeSelection(val api: SimpleAPI, val queryString: String) {
-    def from(d: Domain) = new SourceSelection(this, d)
-    def from(name: String) = new SourceSelection(this, api.domain(name))
+  class AttributeSelection(val api: SimpleAPI, val queryString: String, consistency: Consistency) {
+    def from(d: Domain) = new SourceSelection(this, d, consistency)
+    def from(name: String) = new SourceSelection(this, api.domain(name), consistency)
   }
 
-  class CountSelection(val api: SimpleAPI) {
-    def from(d: Domain) = new CountSource(api, d)
-    def from(name: String) = new CountSource(api, api.domain(name))
+  class CountSelection(val api: SimpleAPI, consistency: Consistency) {
+    def from(d: Domain) = new CountSource(api, d, consistency)
+    def from(name: String) = new CountSource(api, api.domain(name), consistency)
   }
 }
