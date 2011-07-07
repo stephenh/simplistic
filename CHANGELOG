@@ -1,3 +1,7 @@
+1.0.14 (2011-07-07)
+ * Fixed: ConsistentRead parameter now correctly passed during GetAttributes
+          request
+
 1.0.13 (2011-07-07)
  * Add implicit consistency parameter on read operations.
 

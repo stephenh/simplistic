@@ -191,7 +191,13 @@ object Request {
     def attributes: Set[String]
     def consistency: Consistency
 
-    def specificParameters = attributeNames(attributes) ++ Map("ItemName"->itemName, "DomainName" -> domainName)
+    def specificParameters = {
+      attributeNames(attributes) ++ Map(
+        "ItemName"       -> itemName,
+        "DomainName"     -> domainName,
+        "ConsistentRead" -> (if (consistency == ConsistentRead) "true" else "false")
+      )
+    }
   }
 
   trait Query extends SimpleDBRequest {
