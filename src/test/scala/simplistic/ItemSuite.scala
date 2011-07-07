@@ -9,6 +9,8 @@ class ItemSuite extends WordSpec with ShouldMatchers with TestUtil.CleanBefore w
 
   val testDomain = account.domain("test")
 
+  implicit val consistency = UnspecifiedConsistency
+
   override def beforeEach() {
     super.beforeEach()
     testDomain.create()

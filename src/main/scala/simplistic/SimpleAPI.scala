@@ -203,36 +203,37 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
   import PutConditions._
   import Attributes.Attribute
 
-  /** Return a string assocating this item with it's domain in the form "domain.item" */
+  /** Return a string associating this item with it's domain in the form "domain.item" */
   def path = domain + "." + name
 
   override def toString = name
 
   /** Read all of the attributes from this item. */
-  def attributes = new ItemSnapshot(
+  def attributes(implicit consistency: Consistency) = new ItemSnapshot(
     this,
-    (new GetAttributesRequest(domain.name, name, Set())).response.result.attributes
+    (new GetAttributesRequest(domain.name, name, Set.empty, consistency)).response.result.attributes
   )
 
-  def attributesOption = {
+  def attributesOption(implicit consistency: Consistency) = {
     val attrs = attributes
 
     if (attrs.isEmpty) None else Some(attrs)
   }
 
   /** Read a selection of attributes from this item */
-  def attributes(attributes: Set[String]) = new ItemSnapshot(
+  def attributes(attributes: Set[String])(implicit consistency: Consistency) = new ItemSnapshot(
     this,
-    (new GetAttributesRequest(domain.name, name, attributes)).response.result.attributes
+    (new GetAttributesRequest(domain.name, name, attributes, consistency)).response.result.attributes
   )
 
   /** Read a single attribute from this item. */
-  def attribute(attributeName: String): Set[String] = {
-    (new GetAttributesRequest(domain.name, name, Set(attributeName)))
+  def attribute(attributeName: String)(implicit consistency: Consistency): Set[String] = {
+    (new GetAttributesRequest(domain.name, name, Set(attributeName), consistency))
       .response.result.attributes.get(attributeName) getOrElse (Set.empty)
   }
 
-  def attribute(attribute: Attribute[_]): Set[String] = this.attribute(attribute.name)
+  def attribute(attribute: Attribute[_])(implicit consistency: Consistency): Set[String] =
+    this.attribute(attribute.name)
 
   private def putAttribute(pair: (String, String), replace: Boolean) = {
     (new PutAttributesRequest(domain.name, name, Map(pair._1 -> (Set(pair._2) -> replace))))
@@ -323,7 +324,7 @@ class Item(val domain: Domain, val name: String)(implicit val api: SimpleAPI)
 
   /** Delete a single attribute in this item. */
   def -=(attributeName: String): ResponseMetadata = {
-    (new DeleteAttributesRequest(domain.name, name, Map(attributeName -> Set())))
+    (new DeleteAttributesRequest(domain.name, name, Map(attributeName -> Set.empty)))
       .response.metadata
   }
 

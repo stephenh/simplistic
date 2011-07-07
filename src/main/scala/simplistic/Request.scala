@@ -188,7 +188,9 @@ object Request {
     def action = "GetAttributes"
     def itemName: String
     def domainName: String
-    def attributes:Set[String]
+    def attributes: Set[String]
+    def consistency: Consistency
+
     def specificParameters = attributeNames(attributes) ++ Map("ItemName"->itemName, "DomainName" -> domainName)
   }
 

@@ -85,7 +85,8 @@ trait Concrete {
   class GetAttributesRequest(
     val domainName: String,
     val itemName: String,
-    val attributes: Set[String]
+    val attributes: Set[String],
+    val consistency: Consistency
   ) extends GetAttributes with Basics {
     def response = new GetAttributesResponse(doRequest(this))
   }
