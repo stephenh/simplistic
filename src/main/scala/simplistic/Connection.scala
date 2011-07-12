@@ -15,7 +15,8 @@
 package simplistic
 
 import Request._
-import scala.xml._
+
+import java.net.SocketTimeoutException
 
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient;
@@ -23,6 +24,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params._
 import org.apache.http.client.methods.HttpPost
+
+import scala.xml._
 
 class ClientConfiguration {
   val maxConnections: Int = 50
@@ -95,10 +98,14 @@ class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: Stri
       try {
         return f
       } catch {
-        case e: ServiceUnavailable if retriesLeft > 0 =>
-          retriesLeft -= 1
-          delay *= 2 // exponential backoff
-          Thread.sleep(delay)
+        case e @ (_: ServiceUnavailable | _: SocketTimeoutException) =>
+          if (retriesLeft > 0) {
+            retriesLeft -= 1
+            delay *= 2 // exponential backoff
+            Thread.sleep(delay)
+          } else {
+            throw e
+          }
       }
     }
     error("unreachable")
