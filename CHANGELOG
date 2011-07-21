@@ -1,3 +1,8 @@
+1.0.16 (2011-07-21)
+ * Fixed: Connection.retryIfUnavailable now handles java.io.Exception which
+          subsumes java.net.SocketException, org.apache.http.NoHttpResponseException
+          (and others presumably)
+
 1.0.15 (2011-07-12)
  * Fixed: Transparently handle SocketTimeoutException in Connection.retryIfUnavailable.
 

@@ -16,7 +16,7 @@ package simplistic
 
 import Request._
 
-import java.net.SocketTimeoutException
+import java.io.IOException
 
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient;
@@ -98,7 +98,9 @@ class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: Stri
       try {
         return f
       } catch {
-        case e @ (_: ServiceUnavailable | _: SocketTimeoutException) =>
+        // note: IOException subsumes java.net.SocketException, org.apache.http.NoHttpResponseException
+        // (and others presumably)
+        case e @ (_: ServiceUnavailable | _: IOException) =>
           if (retriesLeft > 0) {
             retriesLeft -= 1
             delay *= 2 // exponential backoff
