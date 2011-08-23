@@ -2,6 +2,12 @@ require 'buildr/scala'
 
 VERSION_NUMBER = "1.0.17-SNAPSHOT"
 
+# temporary until Scala 2.9.1 is released
+if Buildr::Scala.version =~ /2.9.1/
+  Buildr.settings.build['scala.test'] = "org.scalatest:scalatest_2.9.0:jar:1.6.1"
+  Buildr.settings.build['scala.check'] = "org.scala-tools.testing:scalacheck_2.9.0-1:jar:1.9"
+end
+
 repositories.remote << "http://www.ibiblio.org/maven2/"
 repositories.remote << "http://repo1.maven.org/maven2/"
 
@@ -24,7 +30,7 @@ FAKESDB = "fakesdb:fakesdb-testing:jar:2.4"
 download(artifact(FAKESDB) => 'https://github.com/downloads/stephenh/fakesdb/fakesdb-testing-2.4.jar')
 
 desc 'Scala binding for Amazon SimpleDB'
-define "simplistic" do
+define "simplistic_#{Buildr::Scala.version}" do
   project.version = VERSION_NUMBER
   project.group = "simplistic"
 
