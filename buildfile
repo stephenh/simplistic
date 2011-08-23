@@ -39,5 +39,6 @@ define "simplistic" do
 
   package :jar
   package :scaladoc
+  package :sources
 end
 
