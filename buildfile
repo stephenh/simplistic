@@ -15,7 +15,7 @@ HTTPCLIENT = 'org.apache.httpcomponents:httpclient:jar:4.1.1'
 HTTPCORE = 'org.apache.httpcomponents:httpcore:jar:4.1'
 COMMONSLOG = 'commons-logging:commons-logging:jar:1.1.1'
 
-CODEC = 'commons-codec:commons-codec:jar:1.3'
+CODEC = 'commons-codec:commons-codec:jar:1.5'
 
 SLF4J_VERSION = "1.5.6"
 SLF4J = [
