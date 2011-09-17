@@ -110,7 +110,7 @@ class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: Stri
           }
       }
     }
-    error("unreachable")
+    sys.error("unreachable")
   }
 
   def printer = new PrettyPrinter(80, 2)
