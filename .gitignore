@@ -4,3 +4,7 @@ target/
 .scala_dependencies
 reports/
 *~
+*.jar
+*.log
+*.lock
+
