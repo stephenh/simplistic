@@ -48,6 +48,6 @@ class Signer(key: String) {
     val base64Encoder = new org.apache.commons.codec.binary.Base64
     val encode = base64Encoder.encode(digest)
 
-    "Signature" -> new String(encode)
+    "Signature" -> new String(encode).trim()
   }
 }
