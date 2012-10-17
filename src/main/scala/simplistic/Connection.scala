@@ -68,7 +68,9 @@ class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: Stri
     if (trace) diagnose(request.parameters)
 
     retryIfUnavailable {
-      val method = new HttpPost(url + QueryParameters(signer.sign(request.parameters)))
+      val signedUrl = url + QueryParameters(signer.sign(request.parameters))
+      if (trace) diagnose(signedUrl)
+      val method = new HttpPost(signedUrl)
       var response: HttpResponse = null
 
       try {
@@ -114,6 +116,10 @@ class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: Stri
   }
 
   def printer = new PrettyPrinter(80, 2)
+
+  def diagnose(s: String) {
+    Console.println(s)
+  }
 
   def diagnose(xml: Node) {
     Console.println(printer.format(xml))
