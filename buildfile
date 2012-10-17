@@ -2,12 +2,6 @@ require 'buildr/scala'
 
 VERSION_NUMBER = "1.0.17-SNAPSHOT"
 
-# temporary until Scala 2.9.1 is released
-if Buildr::Scala.version =~ /2.9.1/
-  Buildr.settings.build['scala.test'] = "org.scalatest:scalatest_2.9.0:jar:1.6.1"
-  Buildr.settings.build['scala.check'] = "org.scala-tools.testing:scalacheck_2.9.0-1:jar:1.9"
-end
-
 repositories.remote << "http://www.ibiblio.org/maven2/"
 repositories.remote << "http://repo1.maven.org/maven2/"
 
@@ -33,6 +27,8 @@ desc 'Scala binding for Amazon SimpleDB'
 define "simplistic_#{Buildr::Scala.version}" do
   project.version = VERSION_NUMBER
   project.group = "simplistic"
+
+  project.scalac_options.incremental = true
 
   compile.with HTTPCORE, HTTPCLIENT, CODEC, COMMONSLOG
   compile.using :deprecation => true,
