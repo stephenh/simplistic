@@ -28,7 +28,7 @@ define "simplistic_#{Buildr::Scala.version}" do
   project.version = VERSION_NUMBER
   project.group = "simplistic"
 
-  project.scalac_options.incremental = true
+  #project.scalac_options.incremental = true
 
   compile.with HTTPCORE, HTTPCLIENT, CODEC, COMMONSLOG
   compile.using :deprecation => true,
