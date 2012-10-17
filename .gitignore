@@ -1,3 +1,5 @@
+build.yaml
+Gemfile
 .DS_Store
 target/
 *.tmproj
