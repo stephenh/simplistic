@@ -9,4 +9,5 @@ reports/
 *.jar
 *.log
 *.lock
+ivy*.xml
 
