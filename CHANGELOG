@@ -1,3 +1,9 @@
+1.0.18 (2012-11-02)
+ * Fixed: Also retry when server returns InternalError.
+
+1.0.17 (2012-10-17)
+ * Fixed: Possible SignatureDoesNotMatch issue when using commons-codec v1.4.
+
 1.0.16 (2011-07-21)
  * Fixed: Connection.retryIfUnavailable now handles java.io.Exception which
           subsumes java.net.SocketException, org.apache.http.NoHttpResponseException

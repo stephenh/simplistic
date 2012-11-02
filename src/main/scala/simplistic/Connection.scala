@@ -92,7 +92,7 @@ class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: Stri
   }
 
   private def retryIfUnavailable[T](f: => T): T = {
-    import Exceptions.ServiceUnavailable
+    import Exceptions.{InternalError, ServiceUnavailable}
 
     var retriesLeft = config.maxErrorRetry
     var delay = 50 // milliseconds
@@ -102,7 +102,7 @@ class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: Stri
       } catch {
         // note: IOException subsumes java.net.SocketException, org.apache.http.NoHttpResponseException
         // (and others presumably)
-        case e @ (_: ServiceUnavailable | _: IOException) =>
+        case e @ (_: ServiceUnavailable | _: IOException | _: InternalError) =>
           if (retriesLeft > 0) {
             retriesLeft -= 1
             delay *= 2 // exponential backoff
