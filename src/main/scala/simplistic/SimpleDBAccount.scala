@@ -18,7 +18,7 @@ import Request._
 import scala.xml._
 
 object SimpleDBAccount {
-  val defaultURL = "https://sdb.amazonaws.com"
+  val defaultURL = "https://sdb.amazonaws.com/"
 }
 
 /**
