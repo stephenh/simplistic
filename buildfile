@@ -5,8 +5,8 @@ VERSION_NUMBER = "1.0.19-SNAPSHOT"
 repositories.remote << "http://www.ibiblio.org/maven2/"
 repositories.remote << "http://repo1.maven.org/maven2/"
 
-HTTPCLIENT = 'org.apache.httpcomponents:httpclient:jar:4.1.1'
-HTTPCORE = 'org.apache.httpcomponents:httpcore:jar:4.1'
+HTTPCLIENT = 'org.apache.httpcomponents:httpclient:jar:4.2.1'
+HTTPCORE = 'org.apache.httpcomponents:httpcore:jar:4.2.1'
 COMMONSLOG = 'commons-logging:commons-logging:jar:1.1.1'
 
 CODEC = 'commons-codec:commons-codec:jar:1.5'
