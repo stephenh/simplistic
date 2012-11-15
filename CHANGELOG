@@ -1,3 +1,7 @@
+1.0.20 (2012-11-15)
+ * Can now pass ClientConfiguration to SimpleDBAccount
+ * Improve tracing
+
 1.0.19 (2012-11-12)
  * Update defaultURL = "https://sdb.amazonaws.com/" (added trailing slash)
    avoiding 302-redirect response from AWS.
