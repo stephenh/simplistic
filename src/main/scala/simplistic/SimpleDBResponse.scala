@@ -140,7 +140,7 @@ class DomainMetadataResult(xml: NodeSeq) {
 
 class ResponseMetadata(xml: NodeSeq) {
   val requestId = string("RequestId", xml)
-  val boxUsage = double("BoxUsage", xml)
+  val boxUsage = optionalDouble("BoxUsage", xml) getOrElse 0.0d
   override def toString = "Box Usage: " + boxUsage + "s" + " request id: " + requestId
 }
 
