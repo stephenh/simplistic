@@ -28,10 +28,10 @@ object SimpleDBAccount {
 class SimpleDBAccount(
   val awsAccessKeyId: String,
   awsSecretKey: String,
-  val url: String = SimpleDBAccount.defaultURL
+  val url: String = SimpleDBAccount.defaultURL,
+  val config: ClientConfiguration = new ClientConfiguration
 ) extends SimpleAPI {
-  val clientConfiguration = new ClientConfiguration
-  lazy val connection = new Connection(awsAccessKeyId, awsSecretKey, url, clientConfiguration)
+  lazy val connection = new Connection(awsAccessKeyId, awsSecretKey, url, config)
 
   def doRequest(req: SimpleDBRequest): Elem = connection.makeRequest(req)
 }
