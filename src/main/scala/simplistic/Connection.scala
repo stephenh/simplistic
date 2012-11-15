@@ -75,7 +75,11 @@ class Connection(val awsAccessKeyId: String, awsSecretKey: String, val url: Stri
 
       try {
         response = client.execute(method)
-        val xml = XML.load(response.getEntity.getContent)
+        val code = response.getStatusLine.getStatusCode
+        if (trace) diagnose("HTTP Status Code: " + code)
+        val body = new java.util.Scanner(response.getEntity.getContent).useDelimiter("\\A").next()
+        if (trace) diagnose("Body:\n" + body)
+        val xml = XML.loadString(body)
         if (trace) diagnose(xml)
         xml match {
           case Error(code, message, boxUsage) => throw toException(code, message, boxUsage)
