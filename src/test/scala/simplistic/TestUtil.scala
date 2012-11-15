@@ -9,7 +9,10 @@ import simplistic._
 object TestUtil {
   val jetty = Jetty.apply(8181)
 
-  val account = new SimpleDBAccount("foo", "bar", "http://localhost:8181")
+  val account = new SimpleDBAccount("foo", "bar", "http://localhost:8181/", new ClientConfiguration {
+    override val maxErrorRetry = 3
+  })
+  // account.connection.trace = true
 
   def flush() {
     account.domain("_flush").create
