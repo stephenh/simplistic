@@ -1,0 +1,3 @@
+scala.version: 2.10.4
+scala.test: org.scalatest:scalatest_2.10:jar:2.0
+scala.check.artifact: scalacheck_2.10

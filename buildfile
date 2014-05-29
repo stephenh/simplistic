@@ -19,16 +19,16 @@ SLF4J = [
 ]
 LOG4J = "log4j:log4j:jar:1.2.15"
 
-FAKESDB = "fakesdb:fakesdb-testing:jar:2.6.1"
+FAKESDB = "fakesdb:fakesdb-testing_2.10:jar:2.7.1"
 
-download(artifact(FAKESDB) => 'https://github.com/downloads/stephenh/fakesdb/fakesdb-testing_2.9.1-2.6.1.jar')
+download(artifact(FAKESDB) => 'http://repo.joist.ws/com/bizo/fakesdb-testing_2.10/2.7.1/fakesdb-testing_2.10-2.7.1.jar')
 
 desc 'Scala binding for Amazon SimpleDB'
-define "simplistic_#{Buildr::Scala.version}" do
+define "simplistic_2.10" do
   project.version = VERSION_NUMBER
   project.group = "simplistic"
 
-  project.scalac_options.incremental = true
+  # project.scalac_options.incremental = true
 
   compile.with HTTPCORE, HTTPCLIENT, CODEC, COMMONSLOG
   compile.using :deprecation => true,
